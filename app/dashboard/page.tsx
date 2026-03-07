@@ -80,9 +80,10 @@ export default function DashboardPage() {
         </div>
       </header>
 
-      <div className="flex">
+      <div className="flex relative">
         {/* Main Content */}
-        <main className={`flex-1 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 transition-all ${showChat ? "lg:mr-[32rem]" : ""}`}>
+        <main className={`flex-1 transition-all duration-300 ${showChat ? "lg:pr-[34rem]" : ""}`}>
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           {/* Welcome Section */}
           <div className="mb-8">
             <h1 className="text-3xl font-bold text-white mb-2">
@@ -182,6 +183,7 @@ export default function DashboardPage() {
               <PomodoroTimer />
             </TabsContent>
           </Tabs>
+          </div>
         </main>
 
         {/* AI Chat Panel */}
@@ -199,22 +201,22 @@ export default function DashboardPage() {
 
 function DashboardSkeleton() {
   return (
-    <div className="min-h-screen">
-      <header className="border-b border-border/50">
+    <div className="min-h-screen relative grid-pattern">
+      <header className="border-b border-white/10 sticky top-0 bg-[#0F172A]/80 backdrop-blur-md z-40">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <Skeleton className="h-10 w-10 rounded-lg" />
-            <Skeleton className="h-6 w-24" />
+          <div className="flex items-center gap-3">
+            <Skeleton className="h-10 w-10 rounded-lg bg-white/10" />
+            <Skeleton className="h-6 w-24 bg-white/10" />
           </div>
-          <Skeleton className="h-9 w-24" />
+          <Skeleton className="h-9 w-24 bg-white/10" />
         </div>
       </header>
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <Skeleton className="h-9 w-64 mb-2" />
-        <Skeleton className="h-5 w-96 mb-8" />
+        <Skeleton className="h-9 w-64 mb-2 bg-white/10" />
+        <Skeleton className="h-5 w-96 mb-8 bg-white/10" />
         <StatsOverviewSkeleton />
         <div className="mt-8">
-          <Skeleton className="h-7 w-32 mb-6" />
+          <Skeleton className="h-7 w-32 mb-6 bg-white/10" />
           <CoursesGridSkeleton />
         </div>
       </main>
