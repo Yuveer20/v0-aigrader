@@ -31,37 +31,37 @@ export function StatsOverview({ data }: StatsOverviewProps) {
       label: "Total Courses",
       value: data.totalCourses,
       icon: BookOpen,
-      color: "text-blue-400",
+      color: "text-cyan-400",
     },
     {
       label: "Assignments",
       value: totalAssignments,
       icon: CheckCircle,
-      color: "text-green-400",
+      color: "text-blue-400",
     },
     {
       label: "Completed",
       value: completedAssignments,
       icon: TrendingUp,
-      color: "text-yellow-400",
+      color: "text-emerald-400",
     },
     {
       label: "Overall Grade",
       value: overallGrade !== null ? `${gradeLabel} (${overallGrade}%)` : "N/A",
       icon: Award,
-      color: overallGrade !== null && overallGrade >= 70 ? "text-primary" : "text-orange-400",
+      color: overallGrade !== null && overallGrade >= 70 ? "text-cyan-400" : "text-orange-400",
     },
   ]
 
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
       {stats.map((stat) => (
-        <Card key={stat.label} className="bg-card border-border">
+        <Card key={stat.label} className="bg-white/5 border-white/10 backdrop-blur-sm">
           <CardContent className="p-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-muted-foreground">{stat.label}</p>
-                <p className="text-2xl font-bold text-card-foreground mt-1">
+                <p className="text-sm text-cyan-200/60">{stat.label}</p>
+                <p className="text-2xl font-bold text-white mt-1">
                   {stat.value}
                 </p>
               </div>

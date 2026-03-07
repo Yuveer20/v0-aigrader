@@ -20,11 +20,11 @@ export function CourseCard({ course }: CourseCardProps) {
   const gradeLabel = gradePercentage !== null ? getGradeLabel(gradePercentage) : null
 
   return (
-    <Card className="group hover:border-primary/50 transition-all duration-200">
+    <Card className="group bg-white/5 border-white/10 hover:border-cyan-500/50 transition-all duration-200 backdrop-blur-sm">
       <CardHeader className="pb-3">
         <div className="flex items-start justify-between">
           <div className="flex-1 min-w-0">
-            <CardTitle className="text-lg font-semibold truncate text-card-foreground">
+            <CardTitle className="text-lg font-semibold truncate text-white">
               {course.name}
             </CardTitle>
             {course.section && (
@@ -102,7 +102,7 @@ export function CourseCard({ course }: CourseCardProps) {
             href={course.alternateLink}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex items-center justify-center gap-2 text-sm text-primary hover:text-primary/80 transition-colors pt-2"
+            className="flex items-center justify-center gap-2 text-sm text-cyan-400 hover:text-cyan-300 transition-colors pt-2"
           >
             <span>View in Classroom</span>
             <ExternalLink className="h-4 w-4" />

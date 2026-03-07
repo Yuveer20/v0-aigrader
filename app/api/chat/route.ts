@@ -17,6 +17,11 @@ Your capabilities include:
 3. **Concept Explanation**: Help explain difficult concepts in subjects the student is struggling with.
 4. **Assignment Help**: Provide guidance on how to approach assignments (without doing the work for them).
 5. **Motivation & Support**: Offer encouragement and help students stay motivated.
+6. **Pomodoro Timer Guidance**: The app has a built-in Pomodoro timer feature. When giving study advice, recommend using the Pomodoro technique for focused studying. Explain that the timer is available in the "Pomodoro Timer" tab and helps students:
+   - Focus for 25-minute sessions
+   - Take 5-minute short breaks
+   - Take 15-minute long breaks after 4 sessions
+   - Track completed study sessions
 
 Guidelines:
 - Be encouraging and supportive, never judgmental about grades
@@ -26,30 +31,23 @@ Guidelines:
 - When explaining concepts, use clear language and examples
 - Always encourage the student to seek help from their teachers when needed
 - Format responses clearly with headings, bullet points, and numbered lists when appropriate
+- When suggesting study sessions, recommend using the Pomodoro Timer tab for focused work
+- If a student seems overwhelmed, suggest breaking their work into Pomodoro sessions
 
 If the student's classroom data is not available, you can still provide general study tips and academic advice, but let them know you'd be more helpful with their specific data.`
 
 export async function POST(req: Request) {
-  console.log("[v0] Chat API called")
-  
   const session = await getServerSession(authConfig)
-  console.log("[v0] Session:", session ? "exists" : "null")
 
   if (!session) {
-    console.log("[v0] Unauthorized - no session")
     return new Response("Unauthorized", { status: 401 })
   }
 
   try {
     const body = await req.json()
-    console.log("[v0] Request body keys:", Object.keys(body))
     const { messages, classroomContext } = body as { messages: UIMessage[], classroomContext?: string }
-
-    console.log("[v0] Messages count:", messages?.length || 0)
-    console.log("[v0] API Key exists:", !!process.env.api_key)
     
     if (!messages || messages.length === 0) {
-      console.log("[v0] No messages received")
       return new Response("No messages provided", { status: 400 })
     }
 
@@ -58,7 +56,6 @@ export async function POST(req: Request) {
       ? `${SYSTEM_PROMPT}\n\n--- STUDENT'S CLASSROOM DATA ---\n${classroomContext}\n--- END CLASSROOM DATA ---`
       : SYSTEM_PROMPT
 
-    console.log("[v0] Calling streamText with model gpt-4o-mini")
     const result = streamText({
       model: openai("gpt-4o-mini"),
       system: systemMessage,
@@ -66,10 +63,9 @@ export async function POST(req: Request) {
       abortSignal: req.signal,
     })
 
-    console.log("[v0] Returning stream response")
     return result.toUIMessageStreamResponse()
   } catch (error) {
-    console.error("[v0] Chat API error:", error)
+    console.error("Chat API error:", error)
     return new Response(
       JSON.stringify({ error: "Failed to process chat request" }),
       { status: 500, headers: { "Content-Type": "application/json" } }
