@@ -1,9 +1,6 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import NextAuth from "next-auth"
-import { authOptions } from "@/lib/auth"
+import { authConfig } from "@/lib/auth-config"
 
-// NextAuth v4 handler - DO NOT use 'handlers' export
-const authHandler = NextAuth(authOptions)
+const nextAuthHandler = NextAuth(authConfig)
 
-export const GET = authHandler
-export const POST = authHandler
+export { nextAuthHandler as GET, nextAuthHandler as POST }

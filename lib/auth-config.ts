@@ -17,11 +17,11 @@ declare module "next-auth/jwt" {
   }
 }
 
-export const authOptions: NextAuthOptions = {
+export const authConfig: NextAuthOptions = {
   providers: [
     GoogleProvider({
-      clientId: process.env.GOOGLE_CLIENT_ID!,
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+      clientId: process.env.GOOGLE_CLIENT_ID || "",
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET || "",
       authorization: {
         params: {
           scope: [
@@ -40,7 +40,6 @@ export const authOptions: NextAuthOptions = {
   ],
   callbacks: {
     async jwt({ token, account }) {
-      // Initial sign in
       if (account) {
         return {
           ...token,
@@ -50,27 +49,24 @@ export const authOptions: NextAuthOptions = {
         }
       }
 
-      // Return previous token if not expired
       if (token.expiresAt && Date.now() < token.expiresAt) {
         return token
       }
 
-      // Refresh the token
       if (token.refreshToken) {
         try {
           const response = await fetch("https://oauth2.googleapis.com/token", {
             method: "POST",
             headers: { "Content-Type": "application/x-www-form-urlencoded" },
             body: new URLSearchParams({
-              client_id: process.env.GOOGLE_CLIENT_ID!,
-              client_secret: process.env.GOOGLE_CLIENT_SECRET!,
+              client_id: process.env.GOOGLE_CLIENT_ID || "",
+              client_secret: process.env.GOOGLE_CLIENT_SECRET || "",
               grant_type: "refresh_token",
               refresh_token: token.refreshToken,
             }),
           })
 
           const tokens = await response.json()
-
           if (!response.ok) throw tokens
 
           return {
@@ -96,5 +92,5 @@ export const authOptions: NextAuthOptions = {
   pages: {
     signIn: "/",
   },
-  secret: process.env.AUTH_SECRET,
+  secret: process.env.AUTH_SECRET || process.env.NEXTAUTH_SECRET,
 }

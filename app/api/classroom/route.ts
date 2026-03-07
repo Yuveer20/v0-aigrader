@@ -1,10 +1,10 @@
 import { getServerSession } from "next-auth"
-import { authOptions } from "@/lib/auth"
+import { authConfig } from "@/lib/auth-config"
 import { fetchClassroomData } from "@/lib/classroom"
 import { NextResponse } from "next/server"
 
 export async function GET() {
-  const session = await getServerSession(authOptions)
+  const session = await getServerSession(authConfig)
 
   if (!session?.accessToken) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
