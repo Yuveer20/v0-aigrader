@@ -1,5 +1,6 @@
 import { streamText, convertToModelMessages, UIMessage } from "ai"
-import { auth } from "@/lib/auth"
+import { getServerSession } from "next-auth"
+import { authOptions } from "@/lib/auth"
 
 export const maxDuration = 60
 
@@ -24,7 +25,7 @@ Guidelines:
 If the student's classroom data is not available, you can still provide general study tips and academic advice, but let them know you'd be more helpful with their specific data.`
 
 export async function POST(req: Request) {
-  const session = await auth()
+  const session = await getServerSession(authOptions)
 
   if (!session) {
     return new Response("Unauthorized", { status: 401 })
