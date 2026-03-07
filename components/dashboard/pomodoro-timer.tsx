@@ -77,6 +77,7 @@ export function PomodoroTimer() {
     return () => {
       if (interval) clearInterval(interval)
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isRunning, timeLeft, mode, sessionsCompleted])
 
   const playNotification = () => {
@@ -146,7 +147,7 @@ export function PomodoroTimer() {
             </div>
           </div>
           <p className="text-muted-foreground text-sm mt-1">
-            Stay focused and earn <span className="text-cyan-400 font-medium">+10 points</span> per session!
+            Stay focused and earn <span className="text-primary font-medium">+10 points</span> per session!
           </p>
         </CardHeader>
         <CardContent className="space-y-6">
@@ -205,8 +206,8 @@ export function PomodoroTimer() {
                 />
                 <defs>
                   <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="0%">
-                    <stop offset="0%" stopColor="#3B82F6" />
-                    <stop offset="100%" stopColor="#22D3EE" />
+                    <stop offset="0%" stopColor="var(--theme-primary, #3B82F6)" />
+                    <stop offset="100%" stopColor="var(--theme-accent, #22D3EE)" />
                   </linearGradient>
                 </defs>
               </svg>

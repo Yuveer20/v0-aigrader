@@ -3,7 +3,9 @@
 
 @custom-variant dark (&:is(.dark *));
 
-:root {
+/* Ocean Theme (default) */
+:root,
+[data-theme="ocean"] {
   --background: #0F172A;
   --foreground: #F8FAFC;
   --card: #1E1B4B;
@@ -23,55 +25,84 @@
   --border: #334155;
   --input: #1E293B;
   --ring: #3B82F6;
-  --chart-1: #3B82F6;
-  --chart-2: #22D3EE;
-  --chart-3: #8B5CF6;
-  --chart-4: #10B981;
-  --chart-5: #F59E0B;
   --radius: 0.75rem;
-  --sidebar: #0F172A;
-  --sidebar-foreground: #F8FAFC;
-  --sidebar-primary: #3B82F6;
-  --sidebar-primary-foreground: #FFFFFF;
-  --sidebar-accent: #1E293B;
-  --sidebar-accent-foreground: #F8FAFC;
-  --sidebar-border: #334155;
-  --sidebar-ring: #3B82F6;
+  
+  /* Theme-specific colors */
+  --theme-bg-start: #0F172A;
+  --theme-bg-mid: #1E1B4B;
+  --theme-bg-end: #312E81;
+  --theme-primary: #3B82F6;
+  --theme-accent: #22D3EE;
+  --theme-orb1: rgba(59, 130, 246, 0.15);
+  --theme-orb2: rgba(34, 211, 238, 0.1);
+  --theme-glow: rgba(59, 130, 246, 0.4);
+  --theme-glow-accent: rgba(34, 211, 238, 0.3);
 }
 
-.dark {
-  --background: #0F172A;
-  --foreground: #F8FAFC;
-  --card: #1E1B4B;
-  --card-foreground: #F8FAFC;
-  --popover: #1E1B4B;
-  --popover-foreground: #F8FAFC;
-  --primary: #3B82F6;
+/* Sunset Theme */
+[data-theme="sunset"] {
+  --background: #1C1917;
+  --foreground: #FEF3C7;
+  --card: #451A03;
+  --card-foreground: #FEF3C7;
+  --popover: #451A03;
+  --popover-foreground: #FEF3C7;
+  --primary: #F97316;
   --primary-foreground: #FFFFFF;
-  --secondary: #312E81;
-  --secondary-foreground: #F8FAFC;
-  --muted: #1E293B;
-  --muted-foreground: #94A3B8;
-  --accent: #22D3EE;
-  --accent-foreground: #0F172A;
+  --secondary: #7C2D12;
+  --secondary-foreground: #FEF3C7;
+  --muted: #292524;
+  --muted-foreground: #D6D3D1;
+  --accent: #FBBF24;
+  --accent-foreground: #1C1917;
   --destructive: #EF4444;
   --destructive-foreground: #FFFFFF;
-  --border: #334155;
-  --input: #1E293B;
-  --ring: #3B82F6;
-  --chart-1: #3B82F6;
-  --chart-2: #22D3EE;
-  --chart-3: #8B5CF6;
-  --chart-4: #10B981;
-  --chart-5: #F59E0B;
-  --sidebar: #0F172A;
-  --sidebar-foreground: #F8FAFC;
-  --sidebar-primary: #3B82F6;
-  --sidebar-primary-foreground: #FFFFFF;
-  --sidebar-accent: #1E293B;
-  --sidebar-accent-foreground: #F8FAFC;
-  --sidebar-border: #334155;
-  --sidebar-ring: #3B82F6;
+  --border: #44403C;
+  --input: #292524;
+  --ring: #F97316;
+  
+  --theme-bg-start: #1C1917;
+  --theme-bg-mid: #451A03;
+  --theme-bg-end: #7C2D12;
+  --theme-primary: #F97316;
+  --theme-accent: #FBBF24;
+  --theme-orb1: rgba(249, 115, 22, 0.15);
+  --theme-orb2: rgba(251, 191, 36, 0.1);
+  --theme-glow: rgba(249, 115, 22, 0.4);
+  --theme-glow-accent: rgba(251, 191, 36, 0.3);
+}
+
+/* Midnight Theme */
+[data-theme="midnight"] {
+  --background: #0A0A0A;
+  --foreground: #FAFAFA;
+  --card: #171717;
+  --card-foreground: #FAFAFA;
+  --popover: #171717;
+  --popover-foreground: #FAFAFA;
+  --primary: #A1A1AA;
+  --primary-foreground: #0A0A0A;
+  --secondary: #262626;
+  --secondary-foreground: #FAFAFA;
+  --muted: #171717;
+  --muted-foreground: #A1A1AA;
+  --accent: #FAFAFA;
+  --accent-foreground: #0A0A0A;
+  --destructive: #EF4444;
+  --destructive-foreground: #FFFFFF;
+  --border: #3F3F46;
+  --input: #171717;
+  --ring: #A1A1AA;
+  
+  --theme-bg-start: #0A0A0A;
+  --theme-bg-mid: #171717;
+  --theme-bg-end: #262626;
+  --theme-primary: #71717A;
+  --theme-accent: #FAFAFA;
+  --theme-orb1: rgba(161, 161, 170, 0.1);
+  --theme-orb2: rgba(250, 250, 250, 0.05);
+  --theme-glow: rgba(161, 161, 170, 0.3);
+  --theme-glow-accent: rgba(250, 250, 250, 0.2);
 }
 
 @theme inline {
@@ -96,23 +127,10 @@
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
-  --color-chart-1: var(--chart-1);
-  --color-chart-2: var(--chart-2);
-  --color-chart-3: var(--chart-3);
-  --color-chart-4: var(--chart-4);
-  --color-chart-5: var(--chart-5);
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) + 4px);
-  --color-sidebar: var(--sidebar);
-  --color-sidebar-foreground: var(--sidebar-foreground);
-  --color-sidebar-primary: var(--sidebar-primary);
-  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
-  --color-sidebar-accent: var(--sidebar-accent);
-  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
-  --color-sidebar-border: var(--sidebar-border);
-  --color-sidebar-ring: var(--sidebar-ring);
 }
 
 @layer base {
@@ -121,7 +139,7 @@
   }
   body {
     @apply text-foreground;
-    background: linear-gradient(135deg, #0F172A 0%, #1E1B4B 50%, #312E81 100%);
+    background: linear-gradient(135deg, var(--theme-bg-start) 0%, var(--theme-bg-mid) 50%, var(--theme-bg-end) 100%);
     background-attachment: fixed;
     min-height: 100vh;
     position: relative;
@@ -138,7 +156,7 @@
     height: 50vw;
     max-width: 800px;
     max-height: 800px;
-    background: radial-gradient(circle, rgba(59, 130, 246, 0.15) 0%, transparent 70%);
+    background: radial-gradient(circle, var(--theme-orb1) 0%, transparent 70%);
     pointer-events: none;
     z-index: 0;
     animation: float 20s ease-in-out infinite;
@@ -153,7 +171,7 @@
     height: 60vw;
     max-width: 900px;
     max-height: 900px;
-    background: radial-gradient(circle, rgba(34, 211, 238, 0.1) 0%, transparent 70%);
+    background: radial-gradient(circle, var(--theme-orb2) 0%, transparent 70%);
     pointer-events: none;
     z-index: 0;
     animation: float 25s ease-in-out infinite reverse;
@@ -178,7 +196,7 @@
 
 /* Gradient button utility */
 .btn-gradient {
-  background: linear-gradient(90deg, #3B82F6, #22D3EE);
+  background: linear-gradient(90deg, var(--theme-primary), var(--theme-accent));
   color: white;
   border: none;
   transition: all 0.3s ease;
@@ -202,14 +220,14 @@
 }
 
 .btn-gradient:hover {
-  background: linear-gradient(90deg, #2563EB, #06B6D4);
+  filter: brightness(1.1);
   transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(59, 130, 246, 0.4);
+  box-shadow: 0 8px 25px var(--theme-glow);
 }
 
 /* Accent gradient text */
 .text-gradient {
-  background: linear-gradient(90deg, #3B82F6, #22D3EE);
+  background: linear-gradient(90deg, var(--theme-primary), var(--theme-accent));
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -225,11 +243,11 @@
 
 /* Glow effect for important elements */
 .glow {
-  box-shadow: 0 0 20px rgba(59, 130, 246, 0.3), 0 0 40px rgba(34, 211, 238, 0.1);
+  box-shadow: 0 0 20px var(--theme-glow), 0 0 40px var(--theme-glow-accent);
 }
 
 .glow-text {
-  text-shadow: 0 0 20px rgba(59, 130, 246, 0.5), 0 0 40px rgba(34, 211, 238, 0.3);
+  text-shadow: 0 0 20px var(--theme-glow), 0 0 40px var(--theme-glow-accent);
 }
 
 /* Subtle grid pattern overlay */
@@ -251,7 +269,7 @@
 /* Animated border gradient */
 .border-gradient {
   position: relative;
-  background: rgba(30, 27, 75, 0.8);
+  background: var(--card);
   border-radius: var(--radius);
 }
 
@@ -259,7 +277,7 @@
   content: '';
   position: absolute;
   inset: -2px;
-  background: linear-gradient(90deg, #3B82F6, #22D3EE, #8B5CF6, #3B82F6);
+  background: linear-gradient(90deg, var(--theme-primary), var(--theme-accent), var(--theme-primary));
   background-size: 300% 100%;
   border-radius: calc(var(--radius) + 2px);
   z-index: -1;
@@ -278,10 +296,10 @@
 /* Pulse animation for accents */
 @keyframes pulse-glow {
   0%, 100% {
-    box-shadow: 0 0 20px rgba(59, 130, 246, 0.4);
+    box-shadow: 0 0 20px var(--theme-glow);
   }
   50% {
-    box-shadow: 0 0 40px rgba(34, 211, 238, 0.6);
+    box-shadow: 0 0 40px var(--theme-glow-accent);
   }
 }
 
@@ -301,10 +319,35 @@
 }
 
 ::-webkit-scrollbar-thumb {
-  background: linear-gradient(180deg, #3B82F6, #22D3EE);
+  background: linear-gradient(180deg, var(--theme-primary), var(--theme-accent));
   border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: linear-gradient(180deg, #2563EB, #06B6D4);
+  filter: brightness(1.2);
+}
+
+/* Theme-specific accent classes */
+.theme-primary {
+  color: var(--theme-primary);
+}
+
+.theme-accent {
+  color: var(--theme-accent);
+}
+
+.theme-bg-primary {
+  background-color: var(--theme-primary);
+}
+
+.theme-bg-accent {
+  background-color: var(--theme-accent);
+}
+
+.theme-border-primary {
+  border-color: var(--theme-primary);
+}
+
+.theme-border-accent {
+  border-color: var(--theme-accent);
 }
