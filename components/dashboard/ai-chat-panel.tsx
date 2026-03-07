@@ -20,14 +20,24 @@ export function AIChatPanel({ classroomData, onClose }: AIChatPanelProps) {
 
   const classroomContext = classroomData ? summarizeClassroomData(classroomData) : null
 
-  const { messages, sendMessage, status } = useChat({
+  const { messages, sendMessage, status, error } = useChat({
     transport: new DefaultChatTransport({
       api: "/api/chat",
       body: {
         classroomContext,
       },
     }),
+    onError: (err) => {
+      console.error("[v0] useChat error:", err)
+    },
   })
+
+  // Log any errors
+  useEffect(() => {
+    if (error) {
+      console.error("[v0] Chat error state:", error)
+    }
+  }, [error])
 
   const isLoading = status === "streaming" || status === "submitted"
 
@@ -80,6 +90,13 @@ export function AIChatPanel({ classroomData, onClose }: AIChatPanelProps) {
           <X className="h-5 w-5" />
         </Button>
       </div>
+
+      {/* Error Display */}
+      {error && (
+        <div className="p-4 bg-destructive/10 border-b border-destructive/20 text-destructive text-sm">
+          Error: {error.message || "Something went wrong"}
+        </div>
+      )}
 
       {/* Messages */}
       <ScrollArea className="flex-1 p-4">
