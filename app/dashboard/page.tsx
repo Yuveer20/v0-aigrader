@@ -13,6 +13,7 @@ import { StatsOverview } from "@/components/dashboard/stats-overview"
 import { AIChatPanel } from "@/components/dashboard/ai-chat-panel"
 import { PomodoroTimer } from "@/components/dashboard/pomodoro-timer"
 import { AssignmentTodo } from "@/components/dashboard/assignment-todo"
+import { ThemeSwitcher } from "@/components/dashboard/theme-switcher"
 import { usePoints } from "@/lib/points-context"
 import type { ClassroomData } from "@/types/classroom"
 
@@ -61,11 +62,12 @@ export default function DashboardPage() {
               <span className="text-sm font-bold text-yellow-300">{points}</span>
               <span className="text-xs text-yellow-400/60">pts</span>
             </div>
+            <ThemeSwitcher />
             <Button
               variant="ghost"
               size="sm"
               onClick={() => signOut({ callbackUrl: "/" })}
-              className="gap-2 text-white/70 hover:text-white hover:bg-white/10"
+              className="gap-2 text-foreground/70 hover:text-foreground hover:bg-white/10"
             >
               <LogOut className="h-4 w-4" />
               <span className="hidden sm:inline">Sign Out</span>
