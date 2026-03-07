@@ -30,24 +30,32 @@ Guidelines:
 If the student's classroom data is not available, you can still provide general study tips and academic advice, but let them know you'd be more helpful with their specific data.`
 
 export async function POST(req: Request) {
+  console.log("[v0] Chat API called")
+  
   const session = await getServerSession(authConfig)
+  console.log("[v0] Session:", session ? "exists" : "null")
 
   if (!session) {
+    console.log("[v0] Unauthorized - no session")
     return new Response("Unauthorized", { status: 401 })
   }
 
   try {
     const body = await req.json()
+    console.log("[v0] Request body:", JSON.stringify(body, null, 2))
     const { message, classroomContext } = body
 
     // Build messages array from the incoming message
     const messages: UIMessage[] = body.messages || [message]
+    console.log("[v0] Messages count:", messages.length)
+    console.log("[v0] API Key exists:", !!process.env.api_key)
 
     // Create system message with classroom context
     const systemMessage = classroomContext
       ? `${SYSTEM_PROMPT}\n\n--- STUDENT'S CLASSROOM DATA ---\n${classroomContext}\n--- END CLASSROOM DATA ---`
       : SYSTEM_PROMPT
 
+    console.log("[v0] Calling streamText with model gpt-4o-mini")
     const result = streamText({
       model: openai("gpt-4o-mini"),
       system: systemMessage,
@@ -55,9 +63,10 @@ export async function POST(req: Request) {
       abortSignal: req.signal,
     })
 
+    console.log("[v0] Returning stream response")
     return result.toUIMessageStreamResponse()
   } catch (error) {
-    console.error("Chat API error:", error)
+    console.error("[v0] Chat API error:", error)
     return new Response(
       JSON.stringify({ error: "Failed to process chat request" }),
       { status: 500, headers: { "Content-Type": "application/json" } }
