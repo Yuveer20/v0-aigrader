@@ -14,9 +14,10 @@ interface AIChatPanelProps {
   classroomData?: ClassroomData
   onClose: () => void
   onOpenPomodoro?: () => void
+  isFullPage?: boolean
 }
 
-export function AIChatPanel({ classroomData, onClose, onOpenPomodoro }: AIChatPanelProps) {
+export function AIChatPanel({ classroomData, onClose, onOpenPomodoro, isFullPage = false }: AIChatPanelProps) {
   const [input, setInput] = useState("")
   const scrollRef = useRef<HTMLDivElement>(null)
 
@@ -64,8 +65,12 @@ export function AIChatPanel({ classroomData, onClose, onOpenPomodoro }: AIChatPa
     "How should I use the Pomodoro timer to study?",
   ]
 
+  const containerClass = isFullPage 
+    ? "h-full w-full bg-gradient-to-b from-[#1E1B4B] to-[#312E81] rounded-xl border border-white/10 flex flex-col overflow-hidden"
+    : "fixed right-0 top-0 h-screen w-full max-w-2xl bg-gradient-to-b from-[#1E1B4B] to-[#312E81] border-l border-white/10 flex flex-col z-50"
+
   return (
-    <div className="fixed right-0 top-0 h-screen w-full max-w-2xl bg-gradient-to-b from-[#1E1B4B] to-[#312E81] border-l border-border flex flex-col z-50">
+    <div className={containerClass}>
       {/* Header */}
       <div className="flex items-center justify-between p-4 border-b border-border/50 bg-[#0F172A]/50 backdrop-blur-sm">
         <div className="flex items-center gap-3">
@@ -89,9 +94,11 @@ export function AIChatPanel({ classroomData, onClose, onOpenPomodoro }: AIChatPa
               Pomodoro
             </Button>
           )}
-          <Button variant="ghost" size="icon" onClick={onClose} className="text-white hover:bg-white/10">
-            <X className="h-5 w-5" />
-          </Button>
+          {!isFullPage && (
+            <Button variant="ghost" size="icon" onClick={onClose} className="text-white hover:bg-white/10">
+              <X className="h-5 w-5" />
+            </Button>
+          )}
         </div>
       </div>
 
