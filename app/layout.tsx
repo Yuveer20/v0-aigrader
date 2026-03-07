@@ -1,17 +1,18 @@
 import type { Metadata, Viewport } from 'next'
-import { Inter, Geist_Mono } from 'next/font/google'
+import { Space_Grotesk, JetBrains_Mono } from 'next/font/google'
 import { Analytics } from '@vercel/analytics/next'
 import { Providers } from "@/components/providers"
 import './globals.css'
 
-const inter = Inter({ 
+const spaceGrotesk = Space_Grotesk({ 
   subsets: ["latin"],
-  variable: "--font-inter"
+  variable: "--font-space-grotesk",
+  weight: ["300", "400", "500", "600", "700"]
 })
 
-const geistMono = Geist_Mono({ 
+const jetbrainsMono = JetBrains_Mono({ 
   subsets: ["latin"],
-  variable: "--font-geist-mono"
+  variable: "--font-jetbrains-mono"
 })
 
 export const metadata: Metadata = {
@@ -50,7 +51,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className="dark">
-      <body className={`${inter.variable} ${geistMono.variable} font-sans antialiased min-h-screen`}>
+      <body className={`${spaceGrotesk.variable} ${jetbrainsMono.variable} font-sans antialiased min-h-screen`}>
         <Providers>
           {children}
         </Providers>

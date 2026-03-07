@@ -47,9 +47,9 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen relative grid-pattern">
       {/* Header */}
-      <header className="border-b border-border/50 sticky top-0 bg-[#0F172A]/80 backdrop-blur-md z-40">
+      <header className="border-b border-white/10 sticky top-0 bg-[#0F172A]/80 backdrop-blur-md z-40">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="p-2 rounded-lg bg-gradient-to-r from-blue-500 to-cyan-400">
