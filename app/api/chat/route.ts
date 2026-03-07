@@ -1,6 +1,11 @@
 import { streamText, convertToModelMessages, UIMessage } from "ai"
+import { createOpenAI } from "@ai-sdk/openai"
 import { getServerSession } from "next-auth"
 import { authConfig } from "@/lib/auth-config"
+
+const openai = createOpenAI({
+  apiKey: process.env.api_key,
+})
 
 export const maxDuration = 60
 
@@ -44,7 +49,7 @@ export async function POST(req: Request) {
       : SYSTEM_PROMPT
 
     const result = streamText({
-      model: "openai/gpt-4o-mini",
+      model: openai("gpt-4o-mini"),
       system: systemMessage,
       messages: await convertToModelMessages(messages),
       abortSignal: req.signal,
