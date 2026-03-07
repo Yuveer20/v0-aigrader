@@ -22,7 +22,6 @@ const fetcher = (url: string) => fetch(url).then((res) => {
 export default function DashboardPage() {
   const { data: session, status } = useSession()
   const router = useRouter()
-  const [showChat, setShowChat] = useState(false)
   const [activeTab, setActiveTab] = useState("courses")
 
   const { data: classroomData, error, isLoading, mutate } = useSWR<ClassroomData>(
@@ -41,10 +40,7 @@ export default function DashboardPage() {
     return <DashboardSkeleton />
   }
 
-  const openPomodoroFromChat = () => {
-    setActiveTab("pomodoro")
-    setShowChat(false)
-  }
+
 
   return (
     <div className="min-h-screen relative grid-pattern">
@@ -57,32 +53,21 @@ export default function DashboardPage() {
             </div>
             <span className="text-xl font-bold text-gradient">AIGrader</span>
           </div>
-          <div className="flex items-center gap-3">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setShowChat(!showChat)}
-              className={`gap-2 border-cyan-500/30 ${showChat ? 'bg-cyan-500/20 text-cyan-300' : 'text-cyan-300 hover:bg-cyan-500/10'}`}
-            >
-              <MessageSquare className="h-4 w-4" />
-              <span className="hidden sm:inline">AI Tutor</span>
-            </Button>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => signOut({ callbackUrl: "/" })}
-              className="gap-2 text-white/70 hover:text-white hover:bg-white/10"
-            >
-              <LogOut className="h-4 w-4" />
-              <span className="hidden sm:inline">Sign Out</span>
-            </Button>
-          </div>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => signOut({ callbackUrl: "/" })}
+            className="gap-2 text-white/70 hover:text-white hover:bg-white/10"
+          >
+            <LogOut className="h-4 w-4" />
+            <span className="hidden sm:inline">Sign Out</span>
+          </Button>
         </div>
       </header>
 
       <div className="flex relative">
         {/* Main Content */}
-        <main className={`flex-1 transition-all duration-300 ${showChat ? "lg:pr-[34rem]" : ""}`}>
+        <main className="flex-1">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           {/* Welcome Section */}
           <div className="mb-8">
@@ -103,6 +88,13 @@ export default function DashboardPage() {
               >
                 <BookOpen className="h-4 w-4" />
                 Courses
+              </TabsTrigger>
+              <TabsTrigger 
+                value="tutor"
+                className="gap-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-500 data-[state=active]:to-cyan-400 data-[state=active]:text-white"
+              >
+                <MessageSquare className="h-4 w-4" />
+                AI Tutor
               </TabsTrigger>
               <TabsTrigger 
                 value="pomodoro"
@@ -178,6 +170,16 @@ export default function DashboardPage() {
               </div>
             </TabsContent>
 
+            {/* AI Tutor Tab */}
+            <TabsContent value="tutor" className="h-[calc(100vh-280px)] min-h-[500px]">
+              <AIChatPanel 
+                classroomData={classroomData} 
+                onClose={() => setActiveTab("courses")}
+                onOpenPomodoro={() => setActiveTab("pomodoro")}
+                isFullPage={true}
+              />
+            </TabsContent>
+
             {/* Pomodoro Tab */}
             <TabsContent value="pomodoro">
               <PomodoroTimer />
@@ -186,14 +188,6 @@ export default function DashboardPage() {
           </div>
         </main>
 
-        {/* AI Chat Panel */}
-        {showChat && (
-          <AIChatPanel 
-            classroomData={classroomData} 
-            onClose={() => setShowChat(false)}
-            onOpenPomodoro={openPomodoroFromChat}
-          />
-        )}
       </div>
     </div>
   )
