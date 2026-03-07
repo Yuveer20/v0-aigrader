@@ -18,16 +18,14 @@ export function AIChatPanel({ classroomData, onClose }: AIChatPanelProps) {
   const [input, setInput] = useState("")
   const scrollRef = useRef<HTMLDivElement>(null)
 
+  const classroomContext = classroomData ? summarizeClassroomData(classroomData) : null
+
   const { messages, sendMessage, status } = useChat({
     transport: new DefaultChatTransport({
       api: "/api/chat",
-      prepareSendMessagesRequest: ({ id, messages }) => ({
-        body: {
-          message: messages[messages.length - 1],
-          id,
-          classroomContext: classroomData ? summarizeClassroomData(classroomData) : null,
-        },
-      }),
+      body: {
+        classroomContext,
+      },
     }),
   })
 

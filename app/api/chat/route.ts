@@ -42,13 +42,16 @@ export async function POST(req: Request) {
 
   try {
     const body = await req.json()
-    console.log("[v0] Request body:", JSON.stringify(body, null, 2))
-    const { message, classroomContext } = body
+    console.log("[v0] Request body keys:", Object.keys(body))
+    const { messages, classroomContext } = body as { messages: UIMessage[], classroomContext?: string }
 
-    // Build messages array from the incoming message
-    const messages: UIMessage[] = body.messages || [message]
-    console.log("[v0] Messages count:", messages.length)
+    console.log("[v0] Messages count:", messages?.length || 0)
     console.log("[v0] API Key exists:", !!process.env.api_key)
+    
+    if (!messages || messages.length === 0) {
+      console.log("[v0] No messages received")
+      return new Response("No messages provided", { status: 400 })
+    }
 
     // Create system message with classroom context
     const systemMessage = classroomContext
