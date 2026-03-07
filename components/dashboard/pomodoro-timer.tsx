@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Play, Pause, RotateCcw, Coffee, Brain, Settings } from "lucide-react"
+import { Play, Pause, RotateCcw, Coffee, Brain, Settings, Zap, Trophy } from "lucide-react"
 import {
   Select,
   SelectContent,
@@ -11,6 +11,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
+import { usePoints } from "@/lib/points-context"
 
 type TimerMode = "focus" | "shortBreak" | "longBreak"
 
@@ -27,12 +28,14 @@ const DEFAULT_SETTINGS: TimerSettings = {
 }
 
 export function PomodoroTimer() {
+  const { points, addPoints } = usePoints()
   const [settings, setSettings] = useState<TimerSettings>(DEFAULT_SETTINGS)
   const [mode, setMode] = useState<TimerMode>("focus")
   const [timeLeft, setTimeLeft] = useState(settings.focus * 60)
   const [isRunning, setIsRunning] = useState(false)
   const [sessionsCompleted, setSessionsCompleted] = useState(0)
   const [showSettings, setShowSettings] = useState(false)
+  const [showPointsPopup, setShowPointsPopup] = useState(false)
 
   const resetTimer = useCallback((newMode?: TimerMode) => {
     const targetMode = newMode || mode
@@ -55,6 +58,10 @@ export function PomodoroTimer() {
       // Timer completed
       if (mode === "focus") {
         setSessionsCompleted((prev) => prev + 1)
+        // Award points for completing a focus session
+        addPoints(10, "Completed a focus session")
+        setShowPointsPopup(true)
+        setTimeout(() => setShowPointsPopup(false), 2000)
         // Auto switch to break
         const newMode = (sessionsCompleted + 1) % 4 === 0 ? "longBreak" : "shortBreak"
         setMode(newMode)
@@ -123,16 +130,23 @@ export function PomodoroTimer() {
         <CardHeader className="text-center pb-2">
           <div className="flex items-center justify-between">
             <CardTitle className="text-2xl font-bold text-gradient">Pomodoro Timer</CardTitle>
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => setShowSettings(!showSettings)}
-            >
-              <Settings className="h-5 w-5" />
-            </Button>
+            <div className="flex items-center gap-2">
+              <div className="flex items-center gap-1 px-3 py-1 rounded-full bg-gradient-to-r from-yellow-500/20 to-orange-500/20 border border-yellow-500/30">
+                <Trophy className="h-4 w-4 text-yellow-400" />
+                <span className="text-sm font-bold text-yellow-300">{points}</span>
+                <span className="text-xs text-yellow-400/60">pts</span>
+              </div>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => setShowSettings(!showSettings)}
+              >
+                <Settings className="h-5 w-5" />
+              </Button>
+            </div>
           </div>
           <p className="text-muted-foreground text-sm mt-1">
-            Stay focused and take regular breaks to maximize productivity
+            Stay focused and earn <span className="text-cyan-400 font-medium">+10 points</span> per session!
           </p>
         </CardHeader>
         <CardContent className="space-y-6">
@@ -153,6 +167,16 @@ export function PomodoroTimer() {
               </Button>
             ))}
           </div>
+
+          {/* Points Popup */}
+          {showPointsPopup && (
+            <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-10 animate-bounce">
+              <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-yellow-500 to-orange-500 text-white font-bold shadow-lg">
+                <Zap className="h-5 w-5" />
+                +10 Points!
+              </div>
+            </div>
+          )}
 
           {/* Timer Display */}
           <div className="relative flex items-center justify-center">

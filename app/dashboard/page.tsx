@@ -12,6 +12,8 @@ import { CourseCard } from "@/components/dashboard/course-card"
 import { StatsOverview } from "@/components/dashboard/stats-overview"
 import { AIChatPanel } from "@/components/dashboard/ai-chat-panel"
 import { PomodoroTimer } from "@/components/dashboard/pomodoro-timer"
+import { AssignmentTodo } from "@/components/dashboard/assignment-todo"
+import { usePoints } from "@/lib/points-context"
 import type { ClassroomData } from "@/types/classroom"
 
 const fetcher = (url: string) => fetch(url).then((res) => {
@@ -23,6 +25,7 @@ export default function DashboardPage() {
   const { data: session, status } = useSession()
   const router = useRouter()
   const [activeTab, setActiveTab] = useState("courses")
+  const { points } = usePoints()
 
   const { data: classroomData, error, isLoading, mutate } = useSWR<ClassroomData>(
     session?.accessToken ? "/api/classroom" : null,
@@ -53,15 +56,21 @@ export default function DashboardPage() {
             </div>
             <span className="text-xl font-bold text-gradient">AIGrader</span>
           </div>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => signOut({ callbackUrl: "/" })}
-            className="gap-2 text-white/70 hover:text-white hover:bg-white/10"
-          >
-            <LogOut className="h-4 w-4" />
-            <span className="hidden sm:inline">Sign Out</span>
-          </Button>
+          <div className="flex items-center gap-3">
+            <div className="flex items-center gap-1 px-3 py-1 rounded-full bg-gradient-to-r from-yellow-500/20 to-orange-500/20 border border-yellow-500/30">
+              <span className="text-sm font-bold text-yellow-300">{points}</span>
+              <span className="text-xs text-yellow-400/60">pts</span>
+            </div>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => signOut({ callbackUrl: "/" })}
+              className="gap-2 text-white/70 hover:text-white hover:bg-white/10"
+            >
+              <LogOut className="h-4 w-4" />
+              <span className="hidden sm:inline">Sign Out</span>
+            </Button>
+          </div>
         </div>
       </header>
 
@@ -107,6 +116,21 @@ export default function DashboardPage() {
 
             {/* Courses Tab */}
             <TabsContent value="courses" className="space-y-8">
+              {/* Stats and Todo Row */}
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <div className="lg:col-span-2">
+                  {/* Stats Overview */}
+                  {isLoading ? (
+                    <StatsOverviewSkeleton />
+                  ) : classroomData ? (
+                    <StatsOverview data={classroomData} />
+                  ) : null}
+                </div>
+                <div className="lg:col-span-1">
+                  <AssignmentTodo classroomData={classroomData} />
+                </div>
+              </div>
+
               {/* Error State */}
               {error && (
                 <div className="bg-red-500/10 border border-red-500/20 rounded-xl p-4">
@@ -125,13 +149,6 @@ export default function DashboardPage() {
                   </Button>
                 </div>
               )}
-
-              {/* Stats Overview */}
-              {isLoading ? (
-                <StatsOverviewSkeleton />
-              ) : classroomData ? (
-                <StatsOverview data={classroomData} />
-              ) : null}
 
               {/* Courses Grid */}
               <div>

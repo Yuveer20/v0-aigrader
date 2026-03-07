@@ -5,9 +5,10 @@ import { useChat } from "@ai-sdk/react"
 import { DefaultChatTransport } from "ai"
 import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
-import { X, Send, Brain, User, Loader2, Sparkles, Timer } from "lucide-react"
+import { X, Send, Brain, User, Loader2, Sparkles, Timer, Trophy } from "lucide-react"
 import ReactMarkdown from "react-markdown"
 import remarkGfm from "remark-gfm"
+import { usePoints } from "@/lib/points-context"
 import type { ClassroomData } from "@/types/classroom"
 
 interface AIChatPanelProps {
@@ -20,8 +21,9 @@ interface AIChatPanelProps {
 export function AIChatPanel({ classroomData, onClose, onOpenPomodoro, isFullPage = false }: AIChatPanelProps) {
   const [input, setInput] = useState("")
   const scrollRef = useRef<HTMLDivElement>(null)
+  const { points } = usePoints()
 
-  const classroomContext = classroomData ? summarizeClassroomData(classroomData) : null
+  const classroomContext = classroomData ? summarizeClassroomData(classroomData, points) : `Student's current points: ${points}`
 
   const { messages, sendMessage, status, error } = useChat({
     transport: new DefaultChatTransport({
@@ -83,6 +85,10 @@ export function AIChatPanel({ classroomData, onClose, onOpenPomodoro, isFullPage
           </div>
         </div>
         <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1 px-2 py-1 rounded-full bg-gradient-to-r from-yellow-500/20 to-orange-500/20 border border-yellow-500/30">
+            <Trophy className="h-3 w-3 text-yellow-400" />
+            <span className="text-xs font-bold text-yellow-300">{points}</span>
+          </div>
           {onOpenPomodoro && (
             <Button 
               variant="outline" 
@@ -264,7 +270,7 @@ export function AIChatPanel({ classroomData, onClose, onOpenPomodoro, isFullPage
   )
 }
 
-function summarizeClassroomData(data: ClassroomData): string {
+function summarizeClassroomData(data: ClassroomData, points: number): string {
   const courseSummaries = data.courses.map((course) => {
     const grade = course.averageGrade !== undefined 
       ? `Average grade: ${Math.round(course.averageGrade)}%` 
@@ -291,8 +297,9 @@ ${assignments}`
   return `Student's Google Classroom Data:
 Total courses: ${data.totalCourses}
 Overall average: ${data.overallAverage !== undefined ? Math.round(data.overallAverage) + "%" : "N/A"}
+Student's current points: ${points}
 
 ${courseSummaries}
 
-Note: The student has access to a Pomodoro timer feature for focused study sessions. When giving study advice, suggest using the Pomodoro technique (25 min focus, 5 min break) to maximize productivity.`
+Note: The student earns 10 points per completed Pomodoro focus session. You can award 5-25 bonus points when they demonstrate real learning!`
 }
