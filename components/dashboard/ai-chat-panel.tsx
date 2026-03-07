@@ -9,7 +9,8 @@ import { X, Send, Brain, User, Loader2, Sparkles, Timer, Trophy } from "lucide-r
 import ReactMarkdown from "react-markdown"
 import remarkGfm from "remark-gfm"
 import { usePoints } from "@/lib/points-context"
-import type { ClassroomData } from "@/types/classroom"
+import { useChatContext } from "@/lib/chat-context"
+import type { ClassroomData, CourseWork, StudentSubmission } from "@/types/classroom"
 
 interface AIChatPanelProps {
   classroomData?: ClassroomData
@@ -22,20 +23,36 @@ export function AIChatPanel({ classroomData, onClose, onOpenPomodoro, isFullPage
   const [input, setInput] = useState("")
   const scrollRef = useRef<HTMLDivElement>(null)
   const { points } = usePoints()
+  const { messages: persistedMessages, setMessages: setPersistedMessages } = useChatContext()
 
   const classroomContext = classroomData ? summarizeClassroomData(classroomData, points) : `Student's current points: ${points}`
 
-  const { messages, sendMessage, status, error } = useChat({
+  const { messages, sendMessage, status, error, setMessages } = useChat({
     transport: new DefaultChatTransport({
       api: "/api/chat",
       body: {
         classroomContext,
       },
     }),
+    initialMessages: persistedMessages,
     onError: (err) => {
       console.error("Chat error:", err)
     },
   })
+
+  // Sync messages to context when they change
+  useEffect(() => {
+    if (messages.length > 0) {
+      setPersistedMessages(messages)
+    }
+  }, [messages, setPersistedMessages])
+
+  // Restore messages from context on mount
+  useEffect(() => {
+    if (persistedMessages.length > 0 && messages.length === 0) {
+      setMessages(persistedMessages)
+    }
+  }, []) // Only run on mount
 
   const isLoading = status === "streaming" || status === "submitted"
 
@@ -60,11 +77,10 @@ export function AIChatPanel({ classroomData, onClose, onOpenPomodoro, isFullPage
   }
 
   const suggestedPrompts = [
-    "Analyze my grades and identify areas for improvement",
-    "Create a study plan for my upcoming assignments",
-    "Help me understand a difficult concept",
-    "What subjects need the most attention?",
-    "How should I use the Pomodoro timer to study?",
+    "Analyze my grades and help me improve",
+    "Create a quick study plan for this week",
+    "What should I focus on first?",
+    "Help me understand my toughest subject",
   ]
 
   const containerClass = isFullPage 
@@ -124,10 +140,10 @@ export function AIChatPanel({ classroomData, onClose, onOpenPomodoro, isFullPage
                 <Sparkles className="h-10 w-10 text-white" />
               </div>
               <h3 className="font-bold text-xl text-white mb-2">
-                Your AI Learning Assistant
+                Hey! I&apos;m your AI Study Buddy
               </h3>
               <p className="text-sm text-cyan-200/70 max-w-md mx-auto">
-                I can help you understand your grades, create study plans, explain difficult concepts, and guide you on using the Pomodoro timer for effective studying.
+                I can help you crush your classes - just ask me anything about your grades, assignments, or study tips!
               </p>
             </div>
 
@@ -138,7 +154,7 @@ export function AIChatPanel({ classroomData, onClose, onOpenPomodoro, isFullPage
                   <Timer className="h-8 w-8 text-cyan-400" />
                   <div className="flex-1">
                     <h4 className="font-semibold text-white">Need help focusing?</h4>
-                    <p className="text-sm text-cyan-200/70">Use the Pomodoro timer to boost your productivity</p>
+                    <p className="text-sm text-cyan-200/70">Use the Pomodoro timer to boost your productivity (+10 pts per session!)</p>
                   </div>
                   <Button onClick={onOpenPomodoro} size="sm" className="btn-gradient">
                     Open Timer
@@ -276,8 +292,8 @@ function summarizeClassroomData(data: ClassroomData, points: number): string {
       ? `Average grade: ${Math.round(course.averageGrade)}%` 
       : "No grades yet"
     
-    const assignments = course.courseWork?.slice(0, 5).map((work) => {
-      const submission = course.submissions?.find((s) => s.courseWorkId === work.id)
+    const assignments = course.courseWork?.slice(0, 5).map((work: CourseWork) => {
+      const submission = course.submissions?.find((s: StudentSubmission) => s.courseWorkId === work.id)
       const status = submission?.state === "TURNED_IN" || submission?.state === "RETURNED" 
         ? "completed" 
         : "pending"
@@ -301,5 +317,5 @@ Student's current points: ${points}
 
 ${courseSummaries}
 
-Note: The student earns 10 points per completed Pomodoro focus session. You can award 5-25 bonus points when they demonstrate real learning!`
+Note: The student earns 10 points per completed Pomodoro focus session and 5 points per todo item checked off. You can award 5-25 bonus points when they demonstrate real learning!`
 }
