@@ -33,6 +33,12 @@ export function AIChatPanel({ classroomData, onClose }: AIChatPanelProps) {
 
   const isLoading = status === "streaming" || status === "submitted"
 
+  // Debug logging
+  useEffect(() => {
+    console.log("[v0] useChat status:", status)
+    console.log("[v0] messages:", messages)
+  }, [status, messages])
+
   useEffect(() => {
     if (scrollRef.current) {
       scrollRef.current.scrollIntoView({ behavior: "smooth" })
@@ -41,8 +47,12 @@ export function AIChatPanel({ classroomData, onClose }: AIChatPanelProps) {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
+    console.log("[v0] handleSubmit called, input:", input)
+    console.log("[v0] isLoading:", isLoading)
     if (!input.trim() || isLoading) return
+    console.log("[v0] Sending message...")
     sendMessage({ text: input })
+    console.log("[v0] Message sent, status:", status)
     setInput("")
   }
 
