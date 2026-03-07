@@ -7,6 +7,8 @@ import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { X, Send, Brain, User, Loader2, Sparkles } from "lucide-react"
+import ReactMarkdown from "react-markdown"
+import remarkGfm from "remark-gfm"
 import type { ClassroomData } from "@/types/classroom"
 
 interface AIChatPanelProps {
@@ -28,24 +30,11 @@ export function AIChatPanel({ classroomData, onClose }: AIChatPanelProps) {
       },
     }),
     onError: (err) => {
-      console.error("[v0] useChat error:", err)
+      console.error("Chat error:", err)
     },
   })
 
-  // Log any errors
-  useEffect(() => {
-    if (error) {
-      console.error("[v0] Chat error state:", error)
-    }
-  }, [error])
-
   const isLoading = status === "streaming" || status === "submitted"
-
-  // Debug logging
-  useEffect(() => {
-    console.log("[v0] useChat status:", status)
-    console.log("[v0] messages:", messages)
-  }, [status, messages])
 
   useEffect(() => {
     if (scrollRef.current) {
@@ -55,12 +44,8 @@ export function AIChatPanel({ classroomData, onClose }: AIChatPanelProps) {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    console.log("[v0] handleSubmit called, input:", input)
-    console.log("[v0] isLoading:", isLoading)
     if (!input.trim() || isLoading) return
-    console.log("[v0] Sending message...")
     sendMessage({ text: input })
-    console.log("[v0] Message sent, status:", status)
     setInput("")
   }
 
@@ -99,7 +84,7 @@ export function AIChatPanel({ classroomData, onClose }: AIChatPanelProps) {
       )}
 
       {/* Messages */}
-      <ScrollArea className="flex-1 p-4">
+      <div className="flex-1 overflow-y-auto p-4">
         {messages.length === 0 ? (
           <div className="space-y-4">
             <div className="text-center py-8">
@@ -160,13 +145,28 @@ export function AIChatPanel({ classroomData, onClose }: AIChatPanelProps) {
                       : "bg-muted text-card-foreground"
                   }`}
                 >
-                  <div className="prose prose-sm max-w-none dark:prose-invert">
+                  <div className={`prose prose-sm max-w-none ${message.role === "user" ? "prose-invert" : "dark:prose-invert"}`}>
                     {message.parts.map((part, index) => {
                       if (part.type === "text") {
                         return (
-                          <div key={index} className="whitespace-pre-wrap">
+                          <ReactMarkdown 
+                            key={index} 
+                            remarkPlugins={[remarkGfm]}
+                            components={{
+                              p: ({ children }) => <p className="mb-2 last:mb-0">{children}</p>,
+                              ul: ({ children }) => <ul className="list-disc pl-4 mb-2">{children}</ul>,
+                              ol: ({ children }) => <ol className="list-decimal pl-4 mb-2">{children}</ol>,
+                              li: ({ children }) => <li className="mb-1">{children}</li>,
+                              code: ({ children }) => <code className="bg-black/20 px-1 py-0.5 rounded text-xs">{children}</code>,
+                              pre: ({ children }) => <pre className="bg-black/20 p-2 rounded overflow-x-auto mb-2">{children}</pre>,
+                              h1: ({ children }) => <h1 className="text-lg font-bold mb-2">{children}</h1>,
+                              h2: ({ children }) => <h2 className="text-base font-bold mb-2">{children}</h2>,
+                              h3: ({ children }) => <h3 className="text-sm font-bold mb-1">{children}</h3>,
+                              strong: ({ children }) => <strong className="font-semibold">{children}</strong>,
+                            }}
+                          >
                             {part.text}
-                          </div>
+                          </ReactMarkdown>
                         )
                       }
                       return null
@@ -188,7 +188,7 @@ export function AIChatPanel({ classroomData, onClose }: AIChatPanelProps) {
             <div ref={scrollRef} />
           </div>
         )}
-      </ScrollArea>
+      </div>
 
       {/* Input */}
       <form onSubmit={handleSubmit} className="p-4 border-t border-border">
