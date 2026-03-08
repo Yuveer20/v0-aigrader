@@ -7,7 +7,8 @@ import useSWR from "swr"
 import { Button } from "@/components/ui/button"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { GraduationCap, LogOut, MessageSquare, RefreshCw, Timer, BookOpen, Sparkles } from "lucide-react"
+import { LogOut, MessageSquare, RefreshCw, Timer, BookOpen } from "lucide-react"
+import { ThoriumLogo } from "@/components/thorium-logo"
 import { CourseCard } from "@/components/dashboard/course-card"
 import { StatsOverview } from "@/components/dashboard/stats-overview"
 import { AIChatPanel } from "@/components/dashboard/ai-chat-panel"
@@ -53,10 +54,8 @@ export default function DashboardPage() {
       <header className="border-b border-white/10 sticky top-0 bg-background/80 backdrop-blur-md z-40">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="p-2 rounded-lg logo-gradient">
-              <GraduationCap className="h-6 w-6 text-white" />
-            </div>
-            <span className="text-xl font-bold text-gradient">AIGrader</span>
+            <ThoriumLogo size={40} />
+            <span className="text-xl font-bold text-gradient">Thorium</span>
           </div>
           <div className="flex items-center gap-3">
             <div className="flex items-center gap-1 px-3 py-1 rounded-full points-gradient border border-white/20">
@@ -109,13 +108,6 @@ export default function DashboardPage() {
                 AI Tutor
               </TabsTrigger>
               <TabsTrigger 
-                value="nextsteps"
-                className="gap-2 data-[state=active]:tab-gradient data-[state=active]:text-white"
-              >
-                <Sparkles className="h-4 w-4" />
-                Next Steps
-              </TabsTrigger>
-              <TabsTrigger 
                 value="pomodoro"
                 className="gap-2 data-[state=active]:tab-gradient data-[state=active]:text-white"
               >
@@ -126,19 +118,20 @@ export default function DashboardPage() {
 
             {/* Courses Tab */}
             <TabsContent value="courses" className="space-y-8">
-              {/* Stats and Todo Row */}
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                <div className="lg:col-span-2">
-                  {/* Stats Overview */}
-                  {isLoading ? (
-                    <StatsOverviewSkeleton />
-                  ) : classroomData ? (
-                    <StatsOverview data={classroomData} />
-                  ) : null}
-                </div>
-                <div className="lg:col-span-1">
-                  <AssignmentTodo classroomData={classroomData} />
-                </div>
+              {/* Stats Overview */}
+              {isLoading ? (
+                <StatsOverviewSkeleton />
+              ) : classroomData ? (
+                <StatsOverview data={classroomData} />
+              ) : null}
+
+              {/* Next Steps and Todo Row */}
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <NextSteps 
+                  classroomData={classroomData}
+                  onOpenTutor={() => setActiveTab("tutor")}
+                />
+                <AssignmentTodo classroomData={classroomData} />
               </div>
 
               {/* Error State */}
@@ -205,16 +198,6 @@ export default function DashboardPage() {
                 onOpenPomodoro={() => setActiveTab("pomodoro")}
                 isFullPage={true}
               />
-            </TabsContent>
-
-            {/* Next Steps Tab */}
-            <TabsContent value="nextsteps">
-              <div className="max-w-2xl mx-auto">
-                <NextSteps 
-                  classroomData={classroomData}
-                  onOpenTutor={() => setActiveTab("tutor")}
-                />
-              </div>
             </TabsContent>
 
             {/* Pomodoro Tab */}

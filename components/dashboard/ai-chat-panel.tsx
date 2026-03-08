@@ -96,7 +96,7 @@ export function AIChatPanel({ classroomData, onClose, onOpenPomodoro, isFullPage
             <Brain className="h-6 w-6 text-white" />
           </div>
           <div>
-            <h2 className="font-bold text-lg text-foreground">AI Tutor</h2>
+            <h2 className="font-bold text-lg text-foreground">Thorium AI</h2>
             <p className="text-xs text-muted-foreground">Your personal learning assistant</p>
           </div>
         </div>

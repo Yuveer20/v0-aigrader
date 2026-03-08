@@ -16,7 +16,7 @@ const jetbrainsMono = JetBrains_Mono({
 })
 
 export const metadata: Metadata = {
-  title: 'AIGrader - AI-Powered Learning Assistant',
+  title: 'Thorium - AI-Powered Learning Assistant',
   description: 'Connect your Google Classroom and get personalized AI tutoring to improve your grades',
   generator: 'v0.app',
   icons: {
