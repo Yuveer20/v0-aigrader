@@ -29,7 +29,7 @@ const DEFAULT_SETTINGS: TimerSettings = {
 }
 
 export function PomodoroTimer() {
-  const { addPoints } = usePoints()
+  const { addBonusPoints } = usePoints()
   const [settings, setSettings] = useState<TimerSettings>(DEFAULT_SETTINGS)
   const [mode, setMode] = useState<TimerMode>("focus")
   const [timeLeft, setTimeLeft] = useState(settings.focus * 60)
@@ -60,7 +60,7 @@ export function PomodoroTimer() {
       if (mode === "focus") {
         setSessionsCompleted((prev) => prev + 1)
         // Award points for completing a focus session
-        addPoints(10, "Completed a focus session")
+        addBonusPoints(10, "Completed a focus session")
         setShowPointsPopup(true)
         setTimeout(() => setShowPointsPopup(false), 2000)
         // Auto switch to break

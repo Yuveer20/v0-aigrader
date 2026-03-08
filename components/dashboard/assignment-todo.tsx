@@ -76,11 +76,13 @@ export function AssignmentTodo({ classroomData }: AssignmentTodoProps) {
   }
 
   // Sync assignment points whenever classroom data changes
+  const assignmentsKey = JSON.stringify(allAssignments.map(a => ({ id: a.id, isSubmitted: a.isSubmitted })))
   useEffect(() => {
     if (allAssignments.length > 0) {
       syncAssignmentPoints(allAssignments)
     }
-  }, [JSON.stringify(allAssignments.map(a => ({ id: a.id, isSubmitted: a.isSubmitted })))])
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [assignmentsKey])
 
   // Sort by due date (soonest first), items without due dates at the end
   const sortedTodos = todoItems

@@ -1,11 +1,11 @@
 "use client"
 
-import { createContext, useContext, useState, useEffect, ReactNode, useCallback, useRef } from "react"
+import { createContext, useContext, useState, useEffect, ReactNode, useCallback } from "react"
 
 interface PointsContextType {
   points: number
-  addPoints: (amount: number, reason: string) => void
-  removePoints: (amount: number, reason: string) => void
+  bonusPoints: number
+  addBonusPoints: (amount: number, reason: string) => void
   history: PointEntry[]
   pointsChange: { amount: number; timestamp: number } | null
   syncAssignmentPoints: (assignments: { id: string; title: string; maxPoints?: number; isSubmitted: boolean }[]) => void
@@ -17,45 +17,57 @@ interface PointEntry {
   timestamp: Date
 }
 
-interface TrackedAssignment {
-  id: string
-  title: string
-  pointsAwarded: number
-  isSubmitted: boolean
-}
-
 const PointsContext = createContext<PointsContextType | undefined>(undefined)
 
+const calculatePointsForAssignment = (maxPoints?: number) => {
+  return maxPoints ? Math.min(50, Math.max(10, Math.round(maxPoints / 2))) : 15
+}
+
 export function PointsProvider({ children }: { children: ReactNode }) {
-  const [points, setPoints] = useState(0)
+  // bonusPoints = pomodoro points + AI awarded points (stored separately)
+  const [bonusPoints, setBonusPoints] = useState(0)
   const [history, setHistory] = useState<PointEntry[]>([])
-  const [trackedAssignments, setTrackedAssignments] = useState<TrackedAssignment[]>([])
   const [pointsChange, setPointsChange] = useState<{ amount: number; timestamp: number } | null>(null)
   const [mounted, setMounted] = useState(false)
-  const isInitialSync = useRef(true)
+  
+  // Track submitted assignment IDs and their point values for comparison
+  const [previousSubmissions, setPreviousSubmissions] = useState<Map<string, number>>(new Map())
+  // Assignment points are calculated live based on current submissions
+  const [assignmentPoints, setAssignmentPoints] = useState(0)
 
-  // Load from localStorage on mount
+  // Total points = assignment points + bonus points
+  const points = assignmentPoints + bonusPoints
+
+  // Load bonus points from localStorage on mount
   useEffect(() => {
     setMounted(true)
-    const saved = localStorage.getItem("thorium-points")
+    const saved = localStorage.getItem("thorium-points-v2")
+    console.log("[v0] Loading from localStorage:", saved)
     if (saved) {
       const data = JSON.parse(saved)
-      setPoints(data.points || 0)
+      console.log("[v0] Parsed data:", data)
+      setBonusPoints(data.bonusPoints || 0)
       setHistory(data.history || [])
-      setTrackedAssignments(data.trackedAssignments || [])
+      // Restore previous submissions map
+      if (data.previousSubmissions) {
+        const restored = new Map(Object.entries(data.previousSubmissions))
+        console.log("[v0] Restored previousSubmissions size:", restored.size)
+        setPreviousSubmissions(restored)
+      }
     }
   }, [])
 
   // Save to localStorage on change
   useEffect(() => {
     if (mounted) {
-      localStorage.setItem("thorium-points", JSON.stringify({ 
-        points, 
+      localStorage.setItem("thorium-points-v2", JSON.stringify({ 
+        bonusPoints,
         history,
-        trackedAssignments
+        // Convert Map to object for storage
+        previousSubmissions: Object.fromEntries(previousSubmissions)
       }))
     }
-  }, [points, history, trackedAssignments, mounted])
+  }, [bonusPoints, history, previousSubmissions, mounted])
 
   // Clear points change animation after delay
   useEffect(() => {
@@ -65,12 +77,9 @@ export function PointsProvider({ children }: { children: ReactNode }) {
     }
   }, [pointsChange])
 
-  const calculatePoints = (maxPoints?: number) => {
-    return maxPoints ? Math.min(50, Math.max(10, Math.round(maxPoints / 2))) : 15
-  }
-
-  const addPoints = useCallback((amount: number, reason: string) => {
-    setPoints((prev) => prev + amount)
+  // Add bonus points (from Pomodoro or AI)
+  const addBonusPoints = useCallback((amount: number, reason: string) => {
+    setBonusPoints((prev) => prev + amount)
     setHistory((prev) => [
       { amount, reason, timestamp: new Date() },
       ...prev.slice(0, 49),
@@ -78,84 +87,75 @@ export function PointsProvider({ children }: { children: ReactNode }) {
     setPointsChange({ amount, timestamp: Date.now() })
   }, [])
 
-  const removePoints = useCallback((amount: number, reason: string) => {
-    setPoints((prev) => Math.max(0, prev - amount))
-    setHistory((prev) => [
-      { amount: -amount, reason, timestamp: new Date() },
-      ...prev.slice(0, 49),
-    ])
-    setPointsChange({ amount: -amount, timestamp: Date.now() })
-  }, [])
-
   // Sync assignment points based on current submission state
+  // Points are calculated fresh each time based on submitted assignments
   const syncAssignmentPoints = useCallback((
     assignments: { id: string; title: string; maxPoints?: number; isSubmitted: boolean }[]
   ) => {
-    setTrackedAssignments(prev => {
-      const newTracked = [...prev]
-      let totalPointsChange = 0
-      const changes: { amount: number; reason: string }[] = []
-
-      assignments.forEach(assignment => {
-        const existingIndex = newTracked.findIndex(t => t.id === assignment.id)
-        const pointsValue = calculatePoints(assignment.maxPoints)
-
-        if (assignment.isSubmitted) {
-          // Assignment is submitted
-          if (existingIndex === -1) {
-            // New submission - add points
-            newTracked.push({
-              id: assignment.id,
-              title: assignment.title,
-              pointsAwarded: pointsValue,
-              isSubmitted: true
-            })
-            if (!isInitialSync.current) {
-              totalPointsChange += pointsValue
-              changes.push({ amount: pointsValue, reason: `Submitted: ${assignment.title}` })
-            }
-          } else if (!newTracked[existingIndex].isSubmitted) {
-            // Was unsubmitted, now submitted again - add points back
-            newTracked[existingIndex].isSubmitted = true
-            totalPointsChange += pointsValue
-            changes.push({ amount: pointsValue, reason: `Re-submitted: ${assignment.title}` })
-          }
-        } else {
-          // Assignment is not submitted
-          if (existingIndex !== -1 && newTracked[existingIndex].isSubmitted) {
-            // Was submitted, now unsubmitted - remove points
-            const previousPoints = newTracked[existingIndex].pointsAwarded
-            newTracked[existingIndex].isSubmitted = false
-            totalPointsChange -= previousPoints
-            changes.push({ amount: -previousPoints, reason: `Unsubmitted: ${assignment.title}` })
-          }
-        }
-      })
-
-      // Apply all point changes
-      if (changes.length > 0) {
-        changes.forEach(change => {
-          if (change.amount > 0) {
-            setPoints(p => p + change.amount)
-            setHistory(h => [{ amount: change.amount, reason: change.reason, timestamp: new Date() }, ...h.slice(0, 49)])
-          } else {
-            setPoints(p => Math.max(0, p + change.amount))
-            setHistory(h => [{ amount: change.amount, reason: change.reason, timestamp: new Date() }, ...h.slice(0, 49)])
-          }
-        })
-        setPointsChange({ amount: totalPointsChange, timestamp: Date.now() })
-      }
-
-      isInitialSync.current = false
-      return newTracked
+    console.log("[v0] syncAssignmentPoints called with", assignments.length, "assignments")
+    
+    // Calculate total points from currently submitted assignments
+    const submittedAssignments = assignments.filter(a => a.isSubmitted)
+    console.log("[v0] Submitted assignments:", submittedAssignments.length)
+    
+    const newAssignmentPoints = submittedAssignments.reduce((total, assignment) => {
+      return total + calculatePointsForAssignment(assignment.maxPoints)
+    }, 0)
+    console.log("[v0] Calculated assignment points:", newAssignmentPoints)
+    
+    // Build map of current submissions
+    const currentSubmissions = new Map<string, number>()
+    submittedAssignments.forEach(a => {
+      currentSubmissions.set(a.id, calculatePointsForAssignment(a.maxPoints))
     })
-  }, [])
+    
+    console.log("[v0] Previous submissions size:", previousSubmissions.size)
+    console.log("[v0] Current submissions size:", currentSubmissions.size)
+    
+    // Compare with previous state to detect changes
+    const changes: { amount: number; reason: string }[] = []
+    
+    // Check for new submissions
+    currentSubmissions.forEach((pts, id) => {
+      if (!previousSubmissions.has(id)) {
+        const assignment = assignments.find(a => a.id === id)
+        console.log("[v0] New submission detected:", assignment?.title, "pts:", pts)
+        changes.push({ amount: pts, reason: `Submitted: ${assignment?.title || 'Assignment'}` })
+      }
+    })
+    
+    // Check for unsubmissions
+    previousSubmissions.forEach((pts, id) => {
+      if (!currentSubmissions.has(id)) {
+        const assignment = assignments.find(a => a.id === id)
+        console.log("[v0] Unsubmission detected:", assignment?.title, "pts:", pts)
+        changes.push({ amount: -pts, reason: `Unsubmitted: ${assignment?.title || 'Assignment'}` })
+      }
+    })
+    
+    console.log("[v0] Changes detected:", changes.length)
+    
+    // Update state
+    setAssignmentPoints(newAssignmentPoints)
+    setPreviousSubmissions(currentSubmissions)
+    
+    // Log changes to history and trigger animation
+    if (changes.length > 0) {
+      const netChange = changes.reduce((sum, c) => sum + c.amount, 0)
+      console.log("[v0] Net point change:", netChange)
+      setHistory((prev) => [
+        ...changes.map(c => ({ amount: c.amount, reason: c.reason, timestamp: new Date() })),
+        ...prev.slice(0, 49 - changes.length)
+      ])
+      setPointsChange({ amount: netChange, timestamp: Date.now() })
+    }
+  }, [previousSubmissions])
 
   return (
     <PointsContext.Provider value={{ 
-      points, 
-      addPoints,
-      removePoints,
+      points,
+      bonusPoints,
+      addBonusPoints,
       history,
       pointsChange,
       syncAssignmentPoints
