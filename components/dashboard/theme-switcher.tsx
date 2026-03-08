@@ -7,17 +7,19 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { Palette, Check } from "lucide-react"
-import { useTheme, ThemeVariant, themeConfig } from "@/lib/theme-context"
+import { Palette, Check, Lock } from "lucide-react"
+import { useTheme, ThemeVariant, themeConfig, themeUnlockPoints } from "@/lib/theme-context"
+import { usePoints } from "@/lib/points-context"
 
 const themes: { id: ThemeVariant; label: string; colors: string[] }[] = [
+  { id: "midnight", label: "Midnight", colors: ["#52525B", "#A1A1AA", "#E4E4E7"] },
   { id: "ocean", label: "Ocean", colors: ["#3B82F6", "#22D3EE", "#312E81"] },
-  { id: "sunset", label: "Sunset", colors: ["#F97316", "#FBBF24", "#7C2D12"] },
-  { id: "midnight", label: "Midnight", colors: ["#71717A", "#FAFAFA", "#262626"] },
+  { id: "sunset", label: "Sunset", colors: ["#EA580C", "#FACC15", "#DC2626"] },
 ]
 
 export function ThemeSwitcher() {
-  const { theme, setTheme } = useTheme()
+  const { theme, setTheme, isThemeUnlocked } = useTheme()
+  const { points } = usePoints()
 
   return (
     <DropdownMenu>
@@ -31,26 +33,39 @@ export function ThemeSwitcher() {
           <span className="hidden sm:inline">Theme</span>
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-48 bg-card border-border">
-        {themes.map((t) => (
-          <DropdownMenuItem
-            key={t.id}
-            onClick={() => setTheme(t.id)}
-            className="flex items-center gap-3 cursor-pointer"
-          >
-            <div className="flex gap-1">
-              {t.colors.map((color, i) => (
-                <div
-                  key={i}
-                  className="w-4 h-4 rounded-full border border-white/20"
-                  style={{ backgroundColor: color }}
-                />
-              ))}
-            </div>
-            <span className="flex-1">{t.label}</span>
-            {theme === t.id && <Check className="h-4 w-4 text-primary" />}
-          </DropdownMenuItem>
-        ))}
+      <DropdownMenuContent align="end" className="w-56 bg-card border-border">
+        {themes.map((t) => {
+          const unlocked = isThemeUnlocked(t.id, points)
+          const unlockPts = themeUnlockPoints[t.id]
+          
+          return (
+            <DropdownMenuItem
+              key={t.id}
+              onClick={() => unlocked && setTheme(t.id)}
+              className={`flex items-center gap-3 ${unlocked ? 'cursor-pointer' : 'cursor-not-allowed opacity-60'}`}
+              disabled={!unlocked}
+            >
+              <div className="flex gap-1">
+                {t.colors.map((color, i) => (
+                  <div
+                    key={i}
+                    className="w-4 h-4 rounded-full border border-white/20"
+                    style={{ backgroundColor: color }}
+                  />
+                ))}
+              </div>
+              <span className="flex-1">{t.label}</span>
+              {!unlocked ? (
+                <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                  <Lock className="h-3 w-3" />
+                  <span>{unlockPts} pts</span>
+                </div>
+              ) : theme === t.id ? (
+                <Check className="h-4 w-4 text-primary" />
+              ) : null}
+            </DropdownMenuItem>
+          )
+        })}
       </DropdownMenuContent>
     </DropdownMenu>
   )
