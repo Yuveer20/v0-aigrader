@@ -99,15 +99,31 @@ export async function fetchClassroomData(accessToken: string): Promise<Classroom
           fetchAllSubmissionsForCourse(accessToken, course.id),
         ])
 
-        // Calculate grade statistics
+        // Calculate grade statistics as percentages
+        // We need to match each submission's grade with its courseWork maxPoints
         const gradedSubmissions = submissions.filter(
           (s) => s.assignedGrade !== undefined && s.assignedGrade !== null
         )
 
-        const averageGrade =
-          gradedSubmissions.length > 0
-            ? gradedSubmissions.reduce((sum, s) => sum + (s.assignedGrade || 0), 0) / gradedSubmissions.length
-            : undefined
+        console.log(`[v0] Course: ${course.name}`)
+        console.log(`[v0] Total submissions: ${submissions.length}`)
+        console.log(`[v0] Graded submissions: ${gradedSubmissions.length}`)
+
+        // Calculate average as a percentage by comparing each grade to its maxPoints
+        let totalPercentage = 0
+        let gradedCount = 0
+        
+        gradedSubmissions.forEach((submission) => {
+          const work = courseWork.find((cw) => cw.id === submission.courseWorkId)
+          const maxPoints = work?.maxPoints || 100
+          const percentage = ((submission.assignedGrade || 0) / maxPoints) * 100
+          console.log(`[v0] Assignment: ${work?.title}, Grade: ${submission.assignedGrade}/${maxPoints} = ${percentage.toFixed(1)}%`)
+          totalPercentage += percentage
+          gradedCount++
+        })
+
+        const averageGrade = gradedCount > 0 ? totalPercentage / gradedCount : undefined
+        console.log(`[v0] Average grade for ${course.name}: ${averageGrade?.toFixed(1)}%`)
 
         const completedAssignments = submissions.filter(
           (s) => s.state === "TURNED_IN" || s.state === "RETURNED"
