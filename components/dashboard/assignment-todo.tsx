@@ -81,8 +81,9 @@ export function AssignmentTodo({ classroomData }: AssignmentTodoProps) {
     if (allAssignments.length > 0) {
       syncAssignmentPoints(allAssignments)
     }
+  // syncAssignmentPoints is stable (empty deps), allAssignments changes trigger via assignmentsKey
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [assignmentsKey])
+  }, [assignmentsKey, syncAssignmentPoints])
 
   // Sort by due date (soonest first), items without due dates at the end
   const sortedTodos = todoItems
