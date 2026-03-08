@@ -16,7 +16,7 @@ const ThemeContext = createContext<ThemeContextType | undefined>(undefined)
 export const themeUnlockPoints: Record<ThemeVariant, number> = {
   midnight: 0,    // Default, always unlocked
   ocean: 100,     // Unlock at 100 points
-  sunset: 150,    // Unlock at 150 points
+  sunset: 200,    // Unlock at 150 points
 }
 
 export const themeConfig = {
