@@ -1,6 +1,6 @@
 "use client"
 
-import { createContext, useContext, useState, useEffect, ReactNode, useCallback } from "react"
+import { createContext, useContext, useState, useEffect, ReactNode, useCallback, useRef } from "react"
 
 interface PointsContextType {
   points: number
@@ -30,8 +30,8 @@ export function PointsProvider({ children }: { children: ReactNode }) {
   const [pointsChange, setPointsChange] = useState<{ amount: number; timestamp: number } | null>(null)
   const [mounted, setMounted] = useState(false)
   
-  // Track submitted assignment IDs and their point values for comparison
-  const [previousSubmissions, setPreviousSubmissions] = useState<Map<string, number>>(new Map())
+  // Use ref to track previous submissions to avoid stale closure issues
+  const previousSubmissionsRef = useRef<Map<string, number>>(new Map())
   // Assignment points are calculated live based on current submissions
   const [assignmentPoints, setAssignmentPoints] = useState(0)
 
@@ -42,17 +42,18 @@ export function PointsProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     setMounted(true)
     const saved = localStorage.getItem("thorium-points-v2")
-    console.log("[v0] Loading from localStorage:", saved)
     if (saved) {
       const data = JSON.parse(saved)
-      console.log("[v0] Parsed data:", data)
       setBonusPoints(data.bonusPoints || 0)
       setHistory(data.history || [])
       // Restore previous submissions map
       if (data.previousSubmissions) {
-        const restored = new Map(Object.entries(data.previousSubmissions))
-        console.log("[v0] Restored previousSubmissions size:", restored.size)
-        setPreviousSubmissions(restored)
+        const restored = new Map<string, number>(Object.entries(data.previousSubmissions).map(([k, v]) => [k, Number(v)]))
+        previousSubmissionsRef.current = restored
+        // Calculate initial assignment points from stored submissions
+        let initialPoints = 0
+        restored.forEach((pts) => { initialPoints += pts })
+        setAssignmentPoints(initialPoints)
       }
     }
   }, [])
@@ -64,10 +65,10 @@ export function PointsProvider({ children }: { children: ReactNode }) {
         bonusPoints,
         history,
         // Convert Map to object for storage
-        previousSubmissions: Object.fromEntries(previousSubmissions)
+        previousSubmissions: Object.fromEntries(previousSubmissionsRef.current)
       }))
     }
-  }, [bonusPoints, history, previousSubmissions, mounted])
+  }, [bonusPoints, history, assignmentPoints, mounted])
 
   // Clear points change animation after delay
   useEffect(() => {
@@ -92,16 +93,12 @@ export function PointsProvider({ children }: { children: ReactNode }) {
   const syncAssignmentPoints = useCallback((
     assignments: { id: string; title: string; maxPoints?: number; isSubmitted: boolean }[]
   ) => {
-    console.log("[v0] syncAssignmentPoints called with", assignments.length, "assignments")
-    
     // Calculate total points from currently submitted assignments
     const submittedAssignments = assignments.filter(a => a.isSubmitted)
-    console.log("[v0] Submitted assignments:", submittedAssignments.length)
     
     const newAssignmentPoints = submittedAssignments.reduce((total, assignment) => {
       return total + calculatePointsForAssignment(assignment.maxPoints)
     }, 0)
-    console.log("[v0] Calculated assignment points:", newAssignmentPoints)
     
     // Build map of current submissions
     const currentSubmissions = new Map<string, number>()
@@ -109,8 +106,7 @@ export function PointsProvider({ children }: { children: ReactNode }) {
       currentSubmissions.set(a.id, calculatePointsForAssignment(a.maxPoints))
     })
     
-    console.log("[v0] Previous submissions size:", previousSubmissions.size)
-    console.log("[v0] Current submissions size:", currentSubmissions.size)
+    const previousSubmissions = previousSubmissionsRef.current
     
     // Compare with previous state to detect changes
     const changes: { amount: number; reason: string }[] = []
@@ -119,7 +115,6 @@ export function PointsProvider({ children }: { children: ReactNode }) {
     currentSubmissions.forEach((pts, id) => {
       if (!previousSubmissions.has(id)) {
         const assignment = assignments.find(a => a.id === id)
-        console.log("[v0] New submission detected:", assignment?.title, "pts:", pts)
         changes.push({ amount: pts, reason: `Submitted: ${assignment?.title || 'Assignment'}` })
       }
     })
@@ -128,28 +123,24 @@ export function PointsProvider({ children }: { children: ReactNode }) {
     previousSubmissions.forEach((pts, id) => {
       if (!currentSubmissions.has(id)) {
         const assignment = assignments.find(a => a.id === id)
-        console.log("[v0] Unsubmission detected:", assignment?.title, "pts:", pts)
         changes.push({ amount: -pts, reason: `Unsubmitted: ${assignment?.title || 'Assignment'}` })
       }
     })
     
-    console.log("[v0] Changes detected:", changes.length)
-    
-    // Update state
+    // Update ref and state
+    previousSubmissionsRef.current = currentSubmissions
     setAssignmentPoints(newAssignmentPoints)
-    setPreviousSubmissions(currentSubmissions)
     
     // Log changes to history and trigger animation
     if (changes.length > 0) {
       const netChange = changes.reduce((sum, c) => sum + c.amount, 0)
-      console.log("[v0] Net point change:", netChange)
       setHistory((prev) => [
         ...changes.map(c => ({ amount: c.amount, reason: c.reason, timestamp: new Date() })),
         ...prev.slice(0, 49 - changes.length)
       ])
       setPointsChange({ amount: netChange, timestamp: Date.now() })
     }
-  }, [previousSubmissions])
+  }, [])
 
   return (
     <PointsContext.Provider value={{ 
