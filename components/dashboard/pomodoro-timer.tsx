@@ -132,10 +132,10 @@ export function PomodoroTimer() {
           <div className="flex items-center justify-between">
             <CardTitle className="text-2xl font-bold text-gradient">Pomodoro Timer</CardTitle>
             <div className="flex items-center gap-2">
-              <div className="flex items-center gap-1 px-3 py-1 rounded-full bg-gradient-to-r from-yellow-500/20 to-orange-500/20 border border-yellow-500/30">
-                <Trophy className="h-4 w-4 text-yellow-400" />
-                <span className="text-sm font-bold text-yellow-300">{points}</span>
-                <span className="text-xs text-yellow-400/60">pts</span>
+              <div className="flex items-center gap-1 px-3 py-1 rounded-full points-gradient border border-white/20">
+                <Trophy className="h-4 w-4 text-white" />
+                <span className="text-sm font-bold text-white">{points}</span>
+                <span className="text-xs text-white/70">pts</span>
               </div>
               <Button
                 variant="ghost"

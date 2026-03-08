@@ -7,12 +7,13 @@ import useSWR from "swr"
 import { Button } from "@/components/ui/button"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { GraduationCap, LogOut, MessageSquare, RefreshCw, Timer, BookOpen } from "lucide-react"
+import { GraduationCap, LogOut, MessageSquare, RefreshCw, Timer, BookOpen, Sparkles } from "lucide-react"
 import { CourseCard } from "@/components/dashboard/course-card"
 import { StatsOverview } from "@/components/dashboard/stats-overview"
 import { AIChatPanel } from "@/components/dashboard/ai-chat-panel"
 import { PomodoroTimer } from "@/components/dashboard/pomodoro-timer"
 import { AssignmentTodo } from "@/components/dashboard/assignment-todo"
+import { NextSteps } from "@/components/dashboard/next-steps"
 import { ThemeSwitcher } from "@/components/dashboard/theme-switcher"
 import { usePoints } from "@/lib/points-context"
 import type { ClassroomData } from "@/types/classroom"
@@ -49,18 +50,18 @@ export default function DashboardPage() {
   return (
     <div className="min-h-screen relative grid-pattern">
       {/* Header */}
-      <header className="border-b border-white/10 sticky top-0 bg-[#0F172A]/80 backdrop-blur-md z-40">
+      <header className="border-b border-white/10 sticky top-0 bg-background/80 backdrop-blur-md z-40">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="p-2 rounded-lg bg-gradient-to-r from-blue-500 to-cyan-400">
+            <div className="p-2 rounded-lg logo-gradient">
               <GraduationCap className="h-6 w-6 text-white" />
             </div>
             <span className="text-xl font-bold text-gradient">AIGrader</span>
           </div>
           <div className="flex items-center gap-3">
-            <div className="flex items-center gap-1 px-3 py-1 rounded-full bg-gradient-to-r from-yellow-500/20 to-orange-500/20 border border-yellow-500/30">
-              <span className="text-sm font-bold text-yellow-300">{points}</span>
-              <span className="text-xs text-yellow-400/60">pts</span>
+            <div className="flex items-center gap-1 px-3 py-1 rounded-full points-gradient border border-white/20">
+              <span className="text-sm font-bold text-white">{points}</span>
+              <span className="text-xs text-white/70">pts</span>
             </div>
             <ThemeSwitcher />
             <Button
@@ -82,10 +83,10 @@ export default function DashboardPage() {
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           {/* Welcome Section */}
           <div className="mb-8">
-            <h1 className="text-3xl font-bold text-white mb-2">
+            <h1 className="text-3xl font-bold text-foreground mb-2">
               Welcome back, <span className="text-gradient">{session.user?.name?.split(" ")[0] || "Student"}</span>
             </h1>
-            <p className="text-cyan-200/60">
+            <p className="text-muted-foreground">
               Here&apos;s an overview of your academic progress
             </p>
           </div>
@@ -95,21 +96,28 @@ export default function DashboardPage() {
             <TabsList className="bg-white/5 border border-white/10 p-1">
               <TabsTrigger 
                 value="courses" 
-                className="gap-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-500 data-[state=active]:to-cyan-400 data-[state=active]:text-white"
+                className="gap-2 data-[state=active]:tab-gradient data-[state=active]:text-white"
               >
                 <BookOpen className="h-4 w-4" />
                 Courses
               </TabsTrigger>
               <TabsTrigger 
                 value="tutor"
-                className="gap-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-500 data-[state=active]:to-cyan-400 data-[state=active]:text-white"
+                className="gap-2 data-[state=active]:tab-gradient data-[state=active]:text-white"
               >
                 <MessageSquare className="h-4 w-4" />
                 AI Tutor
               </TabsTrigger>
               <TabsTrigger 
+                value="nextsteps"
+                className="gap-2 data-[state=active]:tab-gradient data-[state=active]:text-white"
+              >
+                <Sparkles className="h-4 w-4" />
+                Next Steps
+              </TabsTrigger>
+              <TabsTrigger 
                 value="pomodoro"
-                className="gap-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-500 data-[state=active]:to-cyan-400 data-[state=active]:text-white"
+                className="gap-2 data-[state=active]:tab-gradient data-[state=active]:text-white"
               >
                 <Timer className="h-4 w-4" />
                 Pomodoro Timer
@@ -161,7 +169,7 @@ export default function DashboardPage() {
                       variant="ghost" 
                       size="sm" 
                       onClick={() => mutate()}
-                      className="text-cyan-300 hover:text-cyan-200 hover:bg-cyan-500/10"
+                      className="text-primary hover:text-primary/80 hover:bg-primary/10"
                     >
                       <RefreshCw className="h-4 w-4 mr-2" />
                       Refresh
@@ -179,9 +187,9 @@ export default function DashboardPage() {
                   </div>
                 ) : (
                   <div className="text-center py-12 bg-white/5 border border-white/10 rounded-xl">
-                    <GraduationCap className="h-12 w-12 text-cyan-400/50 mx-auto mb-4" />
-                    <h3 className="text-lg font-medium text-white mb-2">No courses found</h3>
-                    <p className="text-cyan-200/60">
+                    <GraduationCap className="h-12 w-12 text-primary/50 mx-auto mb-4" />
+                    <h3 className="text-lg font-medium text-foreground mb-2">No courses found</h3>
+                    <p className="text-muted-foreground">
                       You don&apos;t have any active courses in Google Classroom.
                     </p>
                   </div>
@@ -197,6 +205,16 @@ export default function DashboardPage() {
                 onOpenPomodoro={() => setActiveTab("pomodoro")}
                 isFullPage={true}
               />
+            </TabsContent>
+
+            {/* Next Steps Tab */}
+            <TabsContent value="nextsteps">
+              <div className="max-w-2xl mx-auto">
+                <NextSteps 
+                  classroomData={classroomData}
+                  onOpenTutor={() => setActiveTab("tutor")}
+                />
+              </div>
             </TabsContent>
 
             {/* Pomodoro Tab */}

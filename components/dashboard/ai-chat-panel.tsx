@@ -84,33 +84,33 @@ export function AIChatPanel({ classroomData, onClose, onOpenPomodoro, isFullPage
   ]
 
   const containerClass = isFullPage 
-    ? "h-full w-full bg-gradient-to-b from-[#1E1B4B] to-[#312E81] rounded-xl border border-white/10 flex flex-col overflow-hidden"
-    : "fixed right-0 top-0 h-screen w-full max-w-2xl bg-gradient-to-b from-[#1E1B4B] to-[#312E81] border-l border-white/10 flex flex-col z-50"
+    ? "h-full w-full bg-gradient-to-b from-card to-secondary rounded-xl border border-white/10 flex flex-col overflow-hidden"
+    : "fixed right-0 top-0 h-screen w-full max-w-2xl bg-gradient-to-b from-card to-secondary border-l border-white/10 flex flex-col z-50"
 
   return (
     <div className={containerClass}>
       {/* Header */}
-      <div className="flex items-center justify-between p-4 border-b border-border/50 bg-[#0F172A]/50 backdrop-blur-sm">
+      <div className="flex items-center justify-between p-4 border-b border-border/50 bg-background/50 backdrop-blur-sm">
         <div className="flex items-center gap-3">
-          <div className="p-2 rounded-lg bg-gradient-to-r from-blue-500 to-cyan-400">
+          <div className="p-2 rounded-lg logo-gradient">
             <Brain className="h-6 w-6 text-white" />
           </div>
           <div>
-            <h2 className="font-bold text-lg text-white">AI Tutor</h2>
-            <p className="text-xs text-cyan-300">Your personal learning assistant</p>
+            <h2 className="font-bold text-lg text-foreground">AI Tutor</h2>
+            <p className="text-xs text-muted-foreground">Your personal learning assistant</p>
           </div>
         </div>
         <div className="flex items-center gap-2">
-          <div className="flex items-center gap-1 px-2 py-1 rounded-full bg-gradient-to-r from-yellow-500/20 to-orange-500/20 border border-yellow-500/30">
-            <Trophy className="h-3 w-3 text-yellow-400" />
-            <span className="text-xs font-bold text-yellow-300">{points}</span>
+          <div className="flex items-center gap-1 px-2 py-1 rounded-full points-gradient border border-white/20">
+            <Trophy className="h-3 w-3 text-white" />
+            <span className="text-xs font-bold text-white">{points}</span>
           </div>
           {onOpenPomodoro && (
             <Button 
               variant="outline" 
               size="sm" 
               onClick={onOpenPomodoro}
-              className="gap-2 border-cyan-500/30 text-cyan-300 hover:bg-cyan-500/10"
+              className="gap-2 border-primary/30 text-primary hover:bg-primary/10"
             >
               <Timer className="h-4 w-4" />
               Pomodoro
@@ -136,25 +136,25 @@ export function AIChatPanel({ classroomData, onClose, onOpenPomodoro, isFullPage
         {messages.length === 0 ? (
           <div className="space-y-6">
             <div className="text-center py-8">
-              <div className="w-20 h-20 bg-gradient-to-r from-blue-500 to-cyan-400 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg shadow-cyan-500/20">
+              <div className="w-20 h-20 logo-gradient rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg glow">
                 <Sparkles className="h-10 w-10 text-white" />
               </div>
-              <h3 className="font-bold text-xl text-white mb-2">
+              <h3 className="font-bold text-xl text-foreground mb-2">
                 Hey! I&apos;m your AI Study Buddy
               </h3>
-              <p className="text-sm text-cyan-200/70 max-w-md mx-auto">
+              <p className="text-sm text-muted-foreground max-w-md mx-auto">
                 I can help you crush your classes - just ask me anything about your grades, assignments, or study tips!
               </p>
             </div>
 
             {/* Quick Actions */}
             {onOpenPomodoro && (
-              <div className="bg-gradient-to-r from-blue-500/10 to-cyan-500/10 rounded-xl p-4 border border-cyan-500/20">
+              <div className="bg-white/5 rounded-xl p-4 border border-primary/20">
                 <div className="flex items-center gap-3">
-                  <Timer className="h-8 w-8 text-cyan-400" />
+                  <Timer className="h-8 w-8 theme-primary" />
                   <div className="flex-1">
-                    <h4 className="font-semibold text-white">Need help focusing?</h4>
-                    <p className="text-sm text-cyan-200/70">Use the Pomodoro timer to boost your productivity (+10 pts per session!)</p>
+                    <h4 className="font-semibold text-foreground">Need help focusing?</h4>
+                    <p className="text-sm text-muted-foreground">Use the Pomodoro timer to boost your productivity (+10 pts per session!)</p>
                   </div>
                   <Button onClick={onOpenPomodoro} size="sm" className="btn-gradient">
                     Open Timer
@@ -164,7 +164,7 @@ export function AIChatPanel({ classroomData, onClose, onOpenPomodoro, isFullPage
             )}
 
             <div className="space-y-2">
-              <p className="text-xs text-cyan-300/50 uppercase tracking-wider font-medium">
+              <p className="text-xs text-muted-foreground uppercase tracking-wider font-medium">
                 Try asking:
               </p>
               {suggestedPrompts.map((prompt, index) => (
@@ -173,7 +173,7 @@ export function AIChatPanel({ classroomData, onClose, onOpenPomodoro, isFullPage
                   onClick={() => {
                     setInput(prompt)
                   }}
-                  className="w-full text-left p-4 rounded-xl bg-white/5 hover:bg-white/10 text-sm text-white transition-all border border-white/10 hover:border-cyan-500/30"
+                  className="w-full text-left p-4 rounded-xl bg-white/5 hover:bg-white/10 text-sm text-foreground transition-all border border-white/10 hover:border-primary/30"
                 >
                   {prompt}
                 </button>
@@ -192,21 +192,21 @@ export function AIChatPanel({ classroomData, onClose, onOpenPomodoro, isFullPage
                 <div
                   className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${
                     message.role === "user"
-                      ? "bg-gradient-to-r from-blue-500 to-cyan-400"
+                      ? "logo-gradient"
                       : "bg-white/10"
                   }`}
                 >
                   {message.role === "user" ? (
                     <User className="h-5 w-5 text-white" />
                   ) : (
-                    <Brain className="h-5 w-5 text-cyan-400" />
+                    <Brain className="h-5 w-5 theme-primary" />
                   )}
                 </div>
                 <div
                   className={`flex-1 rounded-xl p-4 ${
                     message.role === "user"
-                      ? "bg-gradient-to-r from-blue-500 to-cyan-400 text-white"
-                      : "bg-white/5 text-white border border-white/10"
+                      ? "logo-gradient text-white"
+                      : "bg-white/5 text-foreground border border-white/10"
                   }`}
                 >
                   <div className={`prose prose-sm max-w-none ${message.role === "user" ? "prose-invert" : "prose-invert"}`}>
@@ -221,13 +221,13 @@ export function AIChatPanel({ classroomData, onClose, onOpenPomodoro, isFullPage
                               ul: ({ children }) => <ul className="list-disc pl-4 mb-3 space-y-1">{children}</ul>,
                               ol: ({ children }) => <ol className="list-decimal pl-4 mb-3 space-y-1">{children}</ol>,
                               li: ({ children }) => <li className="leading-relaxed">{children}</li>,
-                              code: ({ children }) => <code className="bg-black/30 px-1.5 py-0.5 rounded text-xs text-cyan-300">{children}</code>,
+                              code: ({ children }) => <code className="bg-black/30 px-1.5 py-0.5 rounded text-xs theme-accent">{children}</code>,
                               pre: ({ children }) => <pre className="bg-black/30 p-3 rounded-lg overflow-x-auto mb-3">{children}</pre>,
-                              h1: ({ children }) => <h1 className="text-xl font-bold mb-3 text-cyan-300">{children}</h1>,
-                              h2: ({ children }) => <h2 className="text-lg font-bold mb-2 text-cyan-300">{children}</h2>,
-                              h3: ({ children }) => <h3 className="text-base font-bold mb-2 text-cyan-300">{children}</h3>,
-                              strong: ({ children }) => <strong className="font-semibold text-cyan-200">{children}</strong>,
-                              a: ({ href, children }) => <a href={href} className="text-cyan-400 hover:underline">{children}</a>,
+                              h1: ({ children }) => <h1 className="text-xl font-bold mb-3 theme-primary">{children}</h1>,
+                              h2: ({ children }) => <h2 className="text-lg font-bold mb-2 theme-primary">{children}</h2>,
+                              h3: ({ children }) => <h3 className="text-base font-bold mb-2 theme-primary">{children}</h3>,
+                              strong: ({ children }) => <strong className="font-semibold theme-accent">{children}</strong>,
+                              a: ({ href, children }) => <a href={href} className="theme-primary hover:underline">{children}</a>,
                             }}
                           >
                             {part.text}
@@ -243,12 +243,12 @@ export function AIChatPanel({ classroomData, onClose, onOpenPomodoro, isFullPage
             {isLoading && (
               <div className="flex gap-4">
                 <div className="w-10 h-10 rounded-xl flex items-center justify-center bg-white/10">
-                  <Brain className="h-5 w-5 text-cyan-400" />
+                  <Brain className="h-5 w-5 theme-primary" />
                 </div>
                 <div className="flex-1 rounded-xl p-4 bg-white/5 border border-white/10">
                   <div className="flex items-center gap-2">
-                    <Loader2 className="h-4 w-4 animate-spin text-cyan-400" />
-                    <span className="text-sm text-cyan-200/70">Thinking...</span>
+                    <Loader2 className="h-4 w-4 animate-spin theme-primary" />
+                    <span className="text-sm text-muted-foreground">Thinking...</span>
                   </div>
                 </div>
               </div>
@@ -259,14 +259,14 @@ export function AIChatPanel({ classroomData, onClose, onOpenPomodoro, isFullPage
       </div>
 
       {/* Input */}
-      <form onSubmit={handleSubmit} className="p-4 border-t border-border/50 bg-[#0F172A]/50 backdrop-blur-sm">
+      <form onSubmit={handleSubmit} className="p-4 border-t border-border/50 bg-background/50 backdrop-blur-sm">
         <div className="flex gap-3">
           <Textarea
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={handleKeyDown}
             placeholder="Ask me anything about your studies..."
-            className="min-h-[52px] max-h-40 resize-none bg-white/5 border-white/10 text-white placeholder:text-white/40 focus:border-cyan-500/50"
+            className="min-h-[52px] max-h-40 resize-none bg-white/5 border-white/10 text-foreground placeholder:text-muted-foreground focus:border-primary/50"
             disabled={isLoading}
           />
           <Button 
@@ -278,7 +278,7 @@ export function AIChatPanel({ classroomData, onClose, onOpenPomodoro, isFullPage
             <Send className="h-5 w-5" />
           </Button>
         </div>
-        <p className="text-xs text-cyan-300/50 mt-2 text-center">
+        <p className="text-xs text-muted-foreground mt-2 text-center">
           Press Enter to send, Shift+Enter for new line
         </p>
       </form>
