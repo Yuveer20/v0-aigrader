@@ -7,7 +7,7 @@ import useSWR from "swr"
 import { Button } from "@/components/ui/button"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { LogOut, MessageSquare, RefreshCw, Timer, BookOpen } from "lucide-react"
+import { LogOut, MessageSquare, RefreshCw, Timer, BookOpen, GraduationCap } from "lucide-react"
 import { ThoriumLogo } from "@/components/thorium-logo"
 import { CourseCard } from "@/components/dashboard/course-card"
 import { StatsOverview } from "@/components/dashboard/stats-overview"
@@ -16,7 +16,7 @@ import { PomodoroTimer } from "@/components/dashboard/pomodoro-timer"
 import { AssignmentTodo } from "@/components/dashboard/assignment-todo"
 import { NextSteps } from "@/components/dashboard/next-steps"
 import { ThemeSwitcher } from "@/components/dashboard/theme-switcher"
-import { usePoints } from "@/lib/points-context"
+import { PointsDisplay } from "@/components/dashboard/points-display"
 import type { ClassroomData } from "@/types/classroom"
 
 const fetcher = (url: string) => fetch(url).then((res) => {
@@ -28,7 +28,6 @@ export default function DashboardPage() {
   const { data: session, status } = useSession()
   const router = useRouter()
   const [activeTab, setActiveTab] = useState("courses")
-  const { points } = usePoints()
 
   const { data: classroomData, error, isLoading, mutate } = useSWR<ClassroomData>(
     session?.accessToken ? "/api/classroom" : null,
@@ -58,10 +57,7 @@ export default function DashboardPage() {
             <span className="text-xl font-bold text-gradient">Thorium</span>
           </div>
           <div className="flex items-center gap-3">
-            <div className="flex items-center gap-1 px-3 py-1 rounded-full points-gradient border border-white/20">
-              <span className="text-sm font-bold text-white">{points}</span>
-              <span className="text-xs text-white/70">pts</span>
-            </div>
+            <PointsDisplay />
             <ThemeSwitcher />
             <Button
               variant="ghost"
@@ -174,9 +170,11 @@ export default function DashboardPage() {
                   <CoursesGridSkeleton />
                 ) : classroomData?.courses && classroomData.courses.length > 0 ? (
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {classroomData.courses.map((course) => (
-                      <CourseCard key={course.id} course={course} />
-                    ))}
+                    {[...classroomData.courses]
+                      .sort((a, b) => a.name.localeCompare(b.name))
+                      .map((course) => (
+                        <CourseCard key={course.id} course={course} />
+                      ))}
                   </div>
                 ) : (
                   <div className="text-center py-12 bg-white/5 border border-white/10 rounded-xl">

@@ -5,7 +5,8 @@ import { useChat } from "@ai-sdk/react"
 import { DefaultChatTransport } from "ai"
 import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
-import { X, Send, Brain, User, Loader2, Sparkles, Timer, Trophy } from "lucide-react"
+import { X, Send, Brain, User, Loader2, Sparkles, Timer } from "lucide-react"
+import { PointsDisplay } from "./points-display"
 import ReactMarkdown from "react-markdown"
 import remarkGfm from "remark-gfm"
 import { usePoints } from "@/lib/points-context"
@@ -101,10 +102,7 @@ export function AIChatPanel({ classroomData, onClose, onOpenPomodoro, isFullPage
           </div>
         </div>
         <div className="flex items-center gap-2">
-          <div className="flex items-center gap-1 px-2 py-1 rounded-full points-gradient border border-white/20">
-            <Trophy className="h-3 w-3 text-white" />
-            <span className="text-xs font-bold text-white">{points}</span>
-          </div>
+          <PointsDisplay size="sm" />
           {onOpenPomodoro && (
             <Button 
               variant="outline" 

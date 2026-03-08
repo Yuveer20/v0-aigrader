@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useRef } from "react"
+import { useEffect } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { ScrollArea } from "@/components/ui/scroll-area"
@@ -22,8 +22,7 @@ interface TodoItem {
 }
 
 export function AssignmentTodo({ classroomData }: AssignmentTodoProps) {
-  const { checkAndAwardAssignmentPoints, completedAssignmentIds } = usePoints()
-  const previousSubmittedRef = useRef<Set<string>>(new Set())
+  const { syncAssignmentPoints } = usePoints()
 
   // Get all assignments from all courses
   const allAssignments: { id: string; title: string; maxPoints?: number; isSubmitted: boolean }[] = []
@@ -39,7 +38,7 @@ export function AssignmentTodo({ classroomData }: AssignmentTodoProps) {
         
         const isSubmitted = submission?.state === "TURNED_IN" || submission?.state === "RETURNED"
         
-        // Track all assignments for points calculation
+        // Track all published assignments for points calculation
         if (work.state === "PUBLISHED") {
           allAssignments.push({
             id: work.id,
@@ -76,24 +75,12 @@ export function AssignmentTodo({ classroomData }: AssignmentTodoProps) {
     })
   }
 
-  // Check for newly submitted assignments and award points
+  // Sync assignment points whenever classroom data changes
   useEffect(() => {
-    const currentSubmitted = new Set(
-      allAssignments.filter(a => a.isSubmitted).map(a => a.id)
-    )
-    
-    // Find new submissions (not in previous set)
-    const newSubmissions = [...currentSubmitted].filter(id => !previousSubmittedRef.current.has(id))
-    
-    if (newSubmissions.length > 0) {
-      checkAndAwardAssignmentPoints(
-        newSubmissions,
-        allAssignments.map(a => ({ id: a.id, title: a.title, maxPoints: a.maxPoints }))
-      )
+    if (allAssignments.length > 0) {
+      syncAssignmentPoints(allAssignments)
     }
-    
-    previousSubmittedRef.current = currentSubmitted
-  }, [allAssignments, checkAndAwardAssignmentPoints])
+  }, [JSON.stringify(allAssignments.map(a => ({ id: a.id, isSubmitted: a.isSubmitted })))])
 
   // Sort by due date (soonest first), items without due dates at the end
   const sortedTodos = todoItems
@@ -103,7 +90,7 @@ export function AssignmentTodo({ classroomData }: AssignmentTodoProps) {
       if (!b.dueDate) return -1
       return a.dueDate.getTime() - b.dueDate.getTime()
     })
-    .slice(0, 10) // Show top 10
+    .slice(0, 10)
 
   const completedCount = allAssignments.filter(a => a.isSubmitted).length
 
