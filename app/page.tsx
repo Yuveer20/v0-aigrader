@@ -4,7 +4,8 @@ import { signIn, useSession } from "next-auth/react"
 import { useRouter } from "next/navigation"
 import { useEffect } from "react"
 import { Button } from "@/components/ui/button"
-import { GraduationCap, Brain, TrendingUp, BookOpen, Sparkles, Zap, Target } from "lucide-react"
+import { Brain, TrendingUp, BookOpen, Sparkles, Zap, Target } from "lucide-react"
+import { ThoriumLogo } from "@/components/thorium-logo"
 
 export default function LandingPage() {
   const { data: session, status } = useSession()
@@ -33,10 +34,8 @@ export default function LandingPage() {
       <header className="border-b border-white/10 backdrop-blur-md sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="p-2 rounded-xl btn-gradient glow">
-              <GraduationCap className="h-7 w-7 text-white" />
-            </div>
-            <span className="text-2xl font-bold text-gradient tracking-tight">AIGrader</span>
+            <ThoriumLogo size={44} className="glow" />
+            <span className="text-2xl font-bold text-gradient tracking-tight">Thorium</span>
           </div>
           <Button 
             onClick={() => signIn("google")} 
@@ -167,10 +166,8 @@ export default function LandingPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
             <div className="flex items-center gap-3">
-              <div className="p-1.5 rounded-lg bg-gradient-to-r from-blue-500 to-cyan-400">
-                <GraduationCap className="h-5 w-5 text-white" />
-              </div>
-              <span className="text-sm text-cyan-200/60 font-medium">AIGrader</span>
+              <ThoriumLogo size={28} />
+              <span className="text-sm text-muted-foreground font-medium">Thorium</span>
             </div>
             <p className="text-sm text-cyan-200/40">
               Built to help students succeed
