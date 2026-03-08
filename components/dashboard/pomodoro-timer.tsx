@@ -3,7 +3,8 @@
 import { useState, useEffect, useCallback } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Play, Pause, RotateCcw, Coffee, Brain, Settings, Zap, Trophy } from "lucide-react"
+import { Play, Pause, RotateCcw, Coffee, Brain, Settings, Zap } from "lucide-react"
+import { PointsDisplay } from "./points-display"
 import {
   Select,
   SelectContent,
@@ -28,7 +29,7 @@ const DEFAULT_SETTINGS: TimerSettings = {
 }
 
 export function PomodoroTimer() {
-  const { points, addPoints } = usePoints()
+  const { addPoints } = usePoints()
   const [settings, setSettings] = useState<TimerSettings>(DEFAULT_SETTINGS)
   const [mode, setMode] = useState<TimerMode>("focus")
   const [timeLeft, setTimeLeft] = useState(settings.focus * 60)
@@ -132,11 +133,7 @@ export function PomodoroTimer() {
           <div className="flex items-center justify-between">
             <CardTitle className="text-2xl font-bold text-gradient">Pomodoro Timer</CardTitle>
             <div className="flex items-center gap-2">
-              <div className="flex items-center gap-1 px-3 py-1 rounded-full points-gradient border border-white/20">
-                <Trophy className="h-4 w-4 text-white" />
-                <span className="text-sm font-bold text-white">{points}</span>
-                <span className="text-xs text-white/70">pts</span>
-              </div>
+              <PointsDisplay size="sm" />
               <Button
                 variant="ghost"
                 size="icon"
